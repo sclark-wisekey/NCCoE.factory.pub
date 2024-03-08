@@ -1,0 +1,66 @@
+/*=======================================
+SEAL SQ 2023
+Zero-touch Provisioning
+IoT / Tools / Provisioning / Firmware Team
+=======================================*/
+
+//Info Version
+#define DEMO_VERSION "0.0.1"
+
+// Please enter your WIFI credential
+#define WIFI_SSID "YOUR_WIFI_SSID"
+#define WIFI_PASS "YOUR_WIFI_PASSWORD"
+
+#define INES_CONFIG_PATH "../ines/data/inesConfig.ini"
+
+// HTTP REQUEST INES HEADERS
+#define HEADER_USER_AGENT "user-agent"
+#define HEADER_ACCEPT "accept"
+#define HEADER_CONTENT_TYPE "content-type"
+#define HEADER_CONTENT_LENGTH "content-length"
+#define HEADER_AUTHORIZATION "authorization"
+#define USER_AGENT "C_INES_AGENT"
+#define ACCEPT_VALUE "*/*"
+#define JSON_CONTENT_TYPE "application/json"
+#define PKCS7_CONTENT_TYPE "application/pkcs7"
+
+
+//HTTP STANDARDS
+#define GET_METHOD "GET"
+#define POST_METHOD "POST"
+
+//===================================================
+// HTTP  REQUEST INES API REST
+#define CMS_BASE_URL "inesapi.certifyiddemo.com"
+#define IOT_API_REST_PATH_PREFIX "/v2"
+
+#define REST_ORGANIZATION_PREFIX "/organizations"
+
+//Authentication
+#define IOT_API_REST_AUTHENTIFICATION "/auth"
+
+//Certification Authorities
+#define IOT_API_REST_GET_CA_PREFIX "/certificationauthorities" //GET CA LIST, GET CA Details, Get CA Certificate Chain
+#define IOT_API_REST_GET_CA_CERTIFICATE_CHAIN "/download" //Get CA Certificate Chain
+
+//Certificate
+#define IOT_API_REST_CERTIFICATE "/certificates"
+#define IOT_API_REST_CERTIFICATE_RENEW "/renew"
+#define IOT_API_REST_CERTIFICATE_REKEY "/rekey"
+#define IOT_API_REST_CERTIFICATE_REVOKE "/revoke"
+#define IOT_API_REST_CERTIFICATE_LIST_BY_CN "/cn"
+#define IOT_API_REST_CERTIFICATE_VALIDATE_SUFFIX "/validate"
+#define IOT_API_REST_CERTIFICATE_STATUS_SUFFIX "/status"
+#define IOT_API_REST_CERTIFICATE_COMMON_NAME_SUFFIX "/cn"
+
+//Certificate Template
+#define IOT_API_REST_CERTIFICATE_TEMPLATE "/certificatetemplates"
+
+//EST API
+#define EST_SERVER_URL "unspecified"
+#define IOT_API_EST_PATH_PREFIX "/.well-known/est"
+
+#define IOT_API_EST_GET_CA "/cacerts"
+#define IOT_API_EST_ENROLL_CERT "/simpleenroll"
+#define IOT_API_EST_RE_ENROLL_CERT "/simplereenroll"
+#define IOT_API_EST_SERVER_KEY_GEN "/serverkeygen"

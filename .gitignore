@@ -1,52 +1,78 @@
-# Prerequisites
-*.d
-
-# Object files
-*.o
-*.ko
+/Debug/
+.*swp
+*.pydevproject
+.metadata
+.gradle
+bin/
+.bin/
+obj/
+x64/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+*.tlog
 *.obj
-*.elf
+local.properties
+.settings/
+.loadpath
 
-# Linker output
-*.ilk
-*.map
-*.exp
+# Exclude the output files after execution
+factory.csr
+deviceFactoryCert.pem
+deviceFactoryCert.der
 
-# Precompiled Headers
-*.gch
-*.pch
+/Release/
+**/build_factory/
+**/build_client_vaultic/
+**/build/
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
+# Eclipse Core
+.project
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+.AppleDouble
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+.idea
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
+# External tool builders
+.externalToolBuilders/
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+.cproject
+
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
+# Java annotation processor (APT)
+.factorypath
+
+# PDT-specific
+.buildpath
+
+# sbteclipse plugin
+.target
+
+# TeXlipse plugin
+.texlipse
+
+.DS_Store
+*.o
+
+.vs
+
+# Python
+.tox/
+.pytest_cache/
+#build/
+.build/
+*.pyc
+.dist/
+dist/
+/python/.coverage*
+/python/venv*
+/python/cryptoauthlib.egg-info
+/python/VERSION

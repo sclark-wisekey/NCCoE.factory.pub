@@ -1,0 +1,46 @@
+# Nous voulons un cmake "récent" pour utiliser les dernières fonctionnalités
+cmake_minimum_required(VERSION 3.6)
+
+#Project name
+project(ZerotouchProvisioning VERSION 1.0.0)
+
+# On inclut notre bibliothèque dans le processus de CMake
+add_subdirectory(lib/ini)
+add_subdirectory(lib/json)
+
+LINK_DIRECTORIES(lib)
+
+
+#source files directory
+set(SRCS 
+    "src/wisekey_Http_Request_Manager.c"
+    "src/wisekey_Crypto_Tools.c"
+    "src/wisekey_Tools.c"
+    "src/wisekey_Ines_Agent.c"
+    "src/main.c"    
+    )
+
+set(HEADERS
+    "include/wisekey_ZTP_settings.h"
+    "include/wisekey_Http_Request_Manager.h"
+    "include/wisekey_Crypto_Tools.h"
+    "include/wisekey_Tools.h"
+    "include/wisekey_Ines_Agent.h"
+)
+
+INCLUDE_DIRECTORIES(include)
+
+# Ajouter le chemin d'accès à la bibliothèque statique
+link_directories(extlibs/libmbedtls)
+link_directories(extlibs/libwolfssl)
+
+
+# Ajouter le chemin d'accès aux fichiers d'en-tête
+include_directories(extlibs/libmbedtls/include)
+include_directories(extlibs/libwolfssl/include)
+
+
+set(ALL_FILES ${Source_Files})
+add_executable(${PROJECT_NAME} ${SRCS} ${HEADERS})
+
+target_link_libraries(${PROJECT_NAME} ini json libwolfssl.a m)
