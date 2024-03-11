@@ -782,13 +782,17 @@ VLT_STS VltWriteDataBuffer(VLT_U8* pData, VLT_U16 lenData, VLT_U8* sRootFilename
 
 	// Build up the filename from the root
 	char sFilename[100] = { 0 };
+	size_t lenExt = strlen((const char*)sExt);
 	size_t lenRoot = strlen((const char*)sRootFilename);
 	memcpy(sFilename, sRootFilename, lenRoot);
 
 	FILE* pFile = NULL;
 #ifdef _WIN32
-	strcat_s(sFilename, 100, ".");
-	strcat_s(sFilename, 100, (const char*)sExt);
+	if (lenExt > 0)
+	{ 
+		strcat_s(sFilename, 100, ".");
+		strcat_s(sFilename, 100, (const char*)sExt);
+	}
 	size_t csrerr = fopen_s(&pFile, (const char*)sFilename, "wb");
 	if (pFile == NULL)
 	{
@@ -798,8 +802,11 @@ VLT_STS VltWriteDataBuffer(VLT_U8* pData, VLT_U16 lenData, VLT_U8* sRootFilename
 	csrerr = fwrite(pData, lenData, 1, pFile);
 	fclose(pFile);
 #else
-	strcat(sFilename, ".");
-	strcat(sFilename, sExt);
+	if (lenExt > 0)
+	{
+		strcat(sFilename, ".");
+		strcat(sFilename, sExt);
+	}
 	pFile = fopen(sFilename, "wb");
 
 	// test for files not existing.
