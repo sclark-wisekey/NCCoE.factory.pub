@@ -21,7 +21,6 @@ include_directories(vaultic)
 include_directories(${SolutionDir}wolfssl)
 include_directories(${SolutionDir}wolfssl/wolfcrypt)
 include_directories(${SolutionDir}VaultIC-TLS/vaultic_tls/vaultic_tls-4xx/include)
-#include_directories(${SolutionDir}VaultIC-TLS/vaultic_tls/vaultic_elib_405/src/common)
 
 #LINK_DIRECTORIES(lib)
 

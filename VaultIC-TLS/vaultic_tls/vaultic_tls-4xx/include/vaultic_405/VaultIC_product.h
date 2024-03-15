@@ -244,7 +244,8 @@
 #ifdef _WIN32
 #define VLT_PLATFORM                                    VLT_WINDOWS
 #else
-#define VLT_PLATFORM                                	VLT_EMBEDDED
+//#define VLT_PLATFORM                                	VLT_EMBEDDED
+#define VLT_PLATFORM                                	VLT_LINUX
 #endif
 
 #endif // VAULTIC_API_PRODUCT_DEFINITION_H_

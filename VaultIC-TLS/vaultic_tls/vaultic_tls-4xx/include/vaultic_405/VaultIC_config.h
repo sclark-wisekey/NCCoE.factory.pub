@@ -71,6 +71,7 @@
 */
 //#define VLT_PLATFORM        VLT_WINDOWS
 //#define VLT_PLATFORM        VLT_EMBEDDED
+//#define VLT_PLATFORM        VLT_LINUX
 
 /**
 *   Uncomment the protocol you want to use (it also could be defined by PREPROCESSOR variable)

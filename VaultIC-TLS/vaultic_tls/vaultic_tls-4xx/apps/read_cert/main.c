@@ -7,6 +7,7 @@
 #define CHECK_STATUS(label,a) {	VIC_LOGD(label);\
 								int ret_status= (a);\
 							 	if (ret_status!= 0) {VIC_LOGE("%s error %4.4x",label,ret_status);return 1;}\
+                                else printf("Success - %s\n", label);\
 							}
 
 int main(void)
@@ -20,6 +21,10 @@ int main(void)
     unsigned char *device_cert= NULL;
     int sizeof_device_cert=0;
     
+   printf("---------------------------------------------\n");
+   printf("Reading certificate from the VaultIC\n");
+   printf("---------------------------------------------\n");
+
     /* Open session with VaultIC */
     CHECK_STATUS("vlt_tls_init", vlt_tls_init());
     

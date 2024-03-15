@@ -17,6 +17,7 @@
 #define CHECK_STATUS(label,a) {	VIC_LOGD(label);\
 								int ret_status= (a);\
 							 	if (ret_status!= VLT_OK) {VIC_LOGE("%s error %4.4x",label,ret_status);return 1;}\
+                                else printf("Success - %s\n", label);\
 							}
 
 void GetManufPwd(unsigned char *buffer, unsigned char *length);
@@ -27,7 +28,7 @@ int vlt_put_p256_key(char *privkey_file);
 
 extern const VLT_U8 vltApiVersion[];
 
-//#define MANUF_PWD "\x??\x??\x??\x??\x??\x??\x??\x??"
+#define MANUF_PWD "\x58\x6e\x54\x79\x32\x34\x69\x6e"
 
 /* Input arguments:
  * device_key_file : path of device key pair file in DER format
@@ -42,33 +43,34 @@ int main(int argc, char** argv)
     VLT_INIT_COMMS_PARAMS comm_params = { 0 };
     VLT_TARGET_INFO chipInfo;
 
+ 
 #if(VLT_ENABLE_NO_SELF_TESTS_DELAY != VLT_ENABLE)
     VLT_U8 selfTestsMode=0; // Disable FIPS self tests at power on if fast start not supported by the product
 #endif    
 
-    char *deviceKeyFile= NULL;
     char *deviceCertFile=NULL;
     char *caCertFile=NULL;
 
     /* Check for proper calling convention */
-    if( (argc != 3) && (argc != 4))  {
-        printf("usage: %s <device_key_file> <device_cert_file> <ca_cert_file [O]> \n", argv[0]);
-        printf("\t device_key_file  \t path of device key pair file in DER format\n");
+    if( (argc != 2) && (argc != 3))  {
+        printf("usage: %s <device_cert_file> <ca_cert_file [O]> \n", argv[0]);
         printf("\t device_cert_file \t path of device certificate file in DER format\n");
         printf("\t ca_cert_file     \t path of CA certificate file in DER format (optional)\n");
         return -1;
     }
 
-    /* Retrieve name of device key file */
-    deviceKeyFile = argv[1];
 
     /* Retrieve name of device certificate file */
-    deviceCertFile = argv[2];
+    deviceCertFile = argv[1];
 
-    if(argc == 4)
+    if(argc == 3)
     {
-        caCertFile = argv[3];
+        caCertFile = argv[2];
     }
+
+   printf("---------------------------------------------\n");
+   printf("Writing %s to the VaultIC\n", deviceCertFile);
+   printf("---------------------------------------------\n");
 
     // Configure communication parameters
     //---------------------------------------------------------------------
@@ -103,8 +105,10 @@ int main(int argc, char** argv)
 
     // Reset State to CREATION
     //---------------------------------------------------------------------
-    VltSetStatus(VLT_STATE_ACTIVATED);
-    CHECK_STATUS("VltSetStatus CREATION",  VltSetStatus(VLT_STATE_CREATION));
+//    CHECK_STATUS("VltSetStatus ACTIVATED",  VltSetStatus(VLT_STATE_ACTIVATED));
+printf("VltSetStatus>>\n");
+    // CHECK_STATUS("VltSetStatus CREATION",  VltSetStatus(VLT_STATE_CREATION));
+printf("VltSetStatus<<\n");
 
 #if(VLT_ENABLE_NO_SELF_TESTS_DELAY != VLT_ENABLE)
     // Configure power on self tests
@@ -112,54 +116,54 @@ int main(int argc, char** argv)
     CHECK_STATUS("VltSetConfig VLT_SET_CFG_POWERON_SELFTESTS_MODE", VltSetConfig(VLT_SET_CFG_POWERON_SELFTESTS_MODE, VLT_SET_CFG_POWERON_SELFTESTS_MODE_SZ,&selfTestsMode));
 #endif    
 
-    // Delete user 0,1,2,3,4,5,6
-    //    (user 7 is the manufacturer DO NOT DELETE IT)
-    //---------------------------------------------------------------------
-    VLT_MANAGE_AUTH_DATA structAuthSetup;
-    structAuthSetup.enOperationID = VLT_DELETE_USER;
-    structAuthSetup.enUserID = VLT_USER0;
-    for ( VLT_USER_ID i = VLT_USER0; i <= VLT_USER6; i++) {
-        structAuthSetup.enUserID = i;
-        VltManageAuthenticationData(&structAuthSetup);
-    }
+//     // Delete user 0,1,2,3,4,5,6
+//     //    (user 7 is the manufacturer DO NOT DELETE IT)
+//     //---------------------------------------------------------------------
+//     VLT_MANAGE_AUTH_DATA structAuthSetup;
+//     structAuthSetup.enOperationID = VLT_DELETE_USER;
+//     structAuthSetup.enUserID = VLT_USER0;
+//     for ( VLT_USER_ID i = VLT_USER0; i <= VLT_USER6; i++) {
+//         structAuthSetup.enUserID = i;
+//         VltManageAuthenticationData(&structAuthSetup);
+//     }
 
-    // Create TLS user
-    //---------------------------------------------------------------------
-    structAuthSetup.enOperationID = VLT_CREATE_USER;
-    structAuthSetup.u8TryCount = 5;
-    structAuthSetup.enSecurityOption = VLT_NO_DELETE_ON_LOCK;
-    structAuthSetup.enUserID = TLS_USER_ID;
-    structAuthSetup.enRoleID = VLT_NON_APPROVED_USER;
+//     // Create TLS user
+//     //---------------------------------------------------------------------
+//     structAuthSetup.enOperationID = VLT_CREATE_USER;
+//     structAuthSetup.u8TryCount = 5;
+//     structAuthSetup.enSecurityOption = VLT_NO_DELETE_ON_LOCK;
+//     structAuthSetup.enUserID = TLS_USER_ID;
+//     structAuthSetup.enRoleID = VLT_NON_APPROVED_USER;
 
-#ifdef USE_SEC_CHANNEL
-    // SCP03 auth method
-    //---------------------------------------------------------------------
-    VLT_U8 au8S_MacStaticKey[] = SMAC_KEY;
-    VLT_U8 au8S_EncStaticKey[] = SENC_KEY;
-    structAuthSetup.enMethod = VLT_AUTH_SCP03;
-    structAuthSetup.enChannelLevel = VLT_CMAC_CENC;
-    structAuthSetup.data.secret.u8NumberOfKeys = 2;
-    structAuthSetup.data.secret.aKeys[0].enKeyID = VLT_KEY_AES_128;
-    structAuthSetup.data.secret.aKeys[0].u8Mask = 0xBE;
-    structAuthSetup.data.secret.aKeys[0].u16KeyLength = sizeof(au8S_MacStaticKey);
-    structAuthSetup.data.secret.aKeys[0].pu8Key = au8S_MacStaticKey;
-    structAuthSetup.data.secret.aKeys[1].enKeyID = VLT_KEY_AES_128;
-    structAuthSetup.data.secret.aKeys[1].u8Mask = 0xEF;
-    structAuthSetup.data.secret.aKeys[1].u16KeyLength = sizeof(au8S_EncStaticKey);
-    structAuthSetup.data.secret.aKeys[1].pu8Key = au8S_EncStaticKey;
-    VIC_LOGD("Encrypted channel enabled, TLS_USER = USER%d (SCP03)\n",TLS_USER_ID);
-#else
-    // Create user 00 with password auth method
-    //---------------------------------------------------------------------
-    structAuthSetup.enMethod = VLT_AUTH_PASSWORD;
-    structAuthSetup.enChannelLevel = VLT_NO_CHANNEL;
-    structAuthSetup.data.password.u8PasswordLength = TLS_USER_PIN_LEN;
-    memset(structAuthSetup.data.password.u8Password, 0x00, sizeof (structAuthSetup.data.password.u8Password));
-    memcpy(structAuthSetup.data.password.u8Password, (VLT_PU8) TLS_USER_PIN, TLS_USER_PIN_LEN);
-    VIC_LOGD("Encrypted channel disabled, TLS_USER = USER%d (PIN)\n",TLS_USER_ID);
-#endif
+// #ifdef USE_SEC_CHANNEL
+//     // SCP03 auth method
+//     //---------------------------------------------------------------------
+//     VLT_U8 au8S_MacStaticKey[] = SMAC_KEY;
+//     VLT_U8 au8S_EncStaticKey[] = SENC_KEY;
+//     structAuthSetup.enMethod = VLT_AUTH_SCP03;
+//     structAuthSetup.enChannelLevel = VLT_CMAC_CENC;
+//     structAuthSetup.data.secret.u8NumberOfKeys = 2;
+//     structAuthSetup.data.secret.aKeys[0].enKeyID = VLT_KEY_AES_128;
+//     structAuthSetup.data.secret.aKeys[0].u8Mask = 0xBE;
+//     structAuthSetup.data.secret.aKeys[0].u16KeyLength = sizeof(au8S_MacStaticKey);
+//     structAuthSetup.data.secret.aKeys[0].pu8Key = au8S_MacStaticKey;
+//     structAuthSetup.data.secret.aKeys[1].enKeyID = VLT_KEY_AES_128;
+//     structAuthSetup.data.secret.aKeys[1].u8Mask = 0xEF;
+//     structAuthSetup.data.secret.aKeys[1].u16KeyLength = sizeof(au8S_EncStaticKey);
+//     structAuthSetup.data.secret.aKeys[1].pu8Key = au8S_EncStaticKey;
+//     VIC_LOGD("Encrypted channel enabled, TLS_USER = USER%d (SCP03)\n",TLS_USER_ID);
+// #else
+//     // Create user 00 with password auth method
+//     //---------------------------------------------------------------------
+//     structAuthSetup.enMethod = VLT_AUTH_PASSWORD;
+//     structAuthSetup.enChannelLevel = VLT_NO_CHANNEL;
+//     structAuthSetup.data.password.u8PasswordLength = TLS_USER_PIN_LEN;
+//     memset(structAuthSetup.data.password.u8Password, 0x00, sizeof (structAuthSetup.data.password.u8Password));
+//     memcpy(structAuthSetup.data.password.u8Password, (VLT_PU8) TLS_USER_PIN, TLS_USER_PIN_LEN);
+//     VIC_LOGD("Encrypted channel disabled, TLS_USER = USER%d (PIN)\n",TLS_USER_ID);
+// #endif
 
-    CHECK_STATUS("VltManageAuthenticationData Create Tls User" , VltManageAuthenticationData(&structAuthSetup));
+    // CHECK_STATUS("VltManageAuthenticationData Create Tls User" , VltManageAuthenticationData(&structAuthSetup));
 
     // Create device cert file
     //---------------------------------------------------------------------
@@ -192,27 +196,27 @@ int main(int argc, char** argv)
     //---------------------------------------------------------------------
     CHECK_STATUS("vlt_copy_file CA certificate ", vlt_copy_file(CA_CERT_NAME, caCertFile ));
 
-    // Put Domain parameters for P256 curve
-    //---------------------------------------------------------------------
-    VLT_FILE_PRIVILEGES structKeyPrivileges;
-    structKeyPrivileges.u8Read = 0xFF; // All users allowed to read
-    structKeyPrivileges.u8Write = (1 << TLS_USER_ID); // Only TLS user can update
-    structKeyPrivileges.u8Delete = (1 << TLS_USER_ID); // Only TLS user can delete
-    structKeyPrivileges.u8Execute = 0xFF; // All users allowed to use
+    // // Put Domain parameters for P256 curve
+    // //---------------------------------------------------------------------
+    // VLT_FILE_PRIVILEGES structKeyPrivileges;
+    // structKeyPrivileges.u8Read = 0xFF; // All users allowed to read
+    // structKeyPrivileges.u8Write = (1 << TLS_USER_ID); // Only TLS user can update
+    // structKeyPrivileges.u8Delete = (1 << TLS_USER_ID); // Only TLS user can delete
+    // structKeyPrivileges.u8Execute = 0xFF; // All users allowed to use
 
-    VLT_KEY_OBJECT theDomainParams;
-    CHECK_STATUS("EcdsaSetKeyObjDomainParams", EcdsaSetKeyObjDomainParams(VLT_ECC_ID_P256, &theDomainParams));
+    // VLT_KEY_OBJECT theDomainParams;
+    // CHECK_STATUS("EcdsaSetKeyObjDomainParams", EcdsaSetKeyObjDomainParams(VLT_ECC_ID_P256, &theDomainParams));
 
-    CHECK_STATUS("VltPutKey P256 domain parameters", VltPutKey(ECC_P256_Para_Group, ECC_P256_Para_Index, &structKeyPrivileges, &theDomainParams));
+    // CHECK_STATUS("VltPutKey P256 domain parameters", VltPutKey(ECC_P256_Para_Group, ECC_P256_Para_Index, &structKeyPrivileges, &theDomainParams));
 
-    // Write device P256 key pair
-    //---------------------------------------------------------------------
-    vlt_put_p256_key(deviceKeyFile);
+    // // Write device P256 key pair
+    // //---------------------------------------------------------------------
+    // vlt_put_p256_key(deviceKeyFile);
 
 
-    // Switch state to ACTIVATED
-    //---------------------------------------------------------------------
-    CHECK_STATUS("VltSetStatus ACTIVATED",  VltSetStatus(VLT_STATE_ACTIVATED));
+    // // Switch state to ACTIVATED
+    // //---------------------------------------------------------------------
+    // CHECK_STATUS("VltSetStatus ACTIVATED",  VltSetStatus(VLT_STATE_ACTIVATED));
 
 
     //---------------------------------------------------------------------
@@ -385,152 +389,152 @@ int vlt_read_vic_file(const char *szVicFilePath, VLT_U8 *u8DataBuffer, VLT_U32 u
     return u32DataLength;
 }
 
-int vlt_put_p256_key(char *privkey_file) {
+// int vlt_put_p256_key(char *privkey_file) {
 
-    FILE *f1;
-    long lSize;
+//     FILE *f1;
+//     long lSize;
 
-    VLT_PU8 buffer;
-    size_t result;
+//     VLT_PU8 buffer;
+//     size_t result;
 
-    if( ( f1 = fopen( privkey_file, "r" ) ) == NULL )
-        return( -1 );
+//     if( ( f1 = fopen( privkey_file, "r" ) ) == NULL )
+//         return( -1 );
 
-    // obtain file size
-    fseek (f1 , 0 , SEEK_END);
-    lSize = ftell (f1);
-    rewind (f1);
+//     // obtain file size
+//     fseek (f1 , 0 , SEEK_END);
+//     lSize = ftell (f1);
+//     rewind (f1);
 
-    // read file content
-    buffer=malloc(lSize);
+//     // read file content
+//     buffer=malloc(lSize);
 
-    result = fread( buffer, 1, lSize, f1 );
-    fclose( f1 );
+//     result = fread( buffer, 1, lSize, f1 );
+//     fclose( f1 );
 
-    if (result != lSize) {
-        free(buffer);
-        printf("*** ERROR: need to check input file: (length = %d)\n", result);
+//     if (result != lSize) {
+//         free(buffer);
+//         printf("*** ERROR: need to check input file: (length = %d)\n", result);
 
-        return -1;
-    }
+//         return -1;
+//     }
 
-    // Parse key file
-    VLT_U16 idx=0;
-    VLT_U16 length=0;
+//     // Parse key file
+//     VLT_U16 idx=0;
+//     VLT_U16 length=0;
 
-    // SEQUENCE_TAG
-    if (getTlv(&idx, buffer, &length, SEQUENCE_TAG) != VLT_OK) {
-        free(buffer);
-        printf("*** ERROR: invalid key file format, SEQUENCE_TAG not found \n");
-        return -1;
-    }
+//     // SEQUENCE_TAG
+//     if (getTlv(&idx, buffer, &length, SEQUENCE_TAG) != VLT_OK) {
+//         free(buffer);
+//         printf("*** ERROR: invalid key file format, SEQUENCE_TAG not found \n");
+//         return -1;
+//     }
 
-    // INTEGER_TAG
-    if (getTlv(&idx, buffer, &length, INTEGER_TAG) != VLT_OK) {
-        free(buffer);
-        printf("*** ERROR: invalid key file format, INTEGER_TAG not found \n");
-        return -1;
-    }
+//     // INTEGER_TAG
+//     if (getTlv(&idx, buffer, &length, INTEGER_TAG) != VLT_OK) {
+//         free(buffer);
+//         printf("*** ERROR: invalid key file format, INTEGER_TAG not found \n");
+//         return -1;
+//     }
 
-    idx++;
+//     idx++;
 
-    // OCTET_STRING Tag
-    if (getTlv(&idx, buffer, &length, OCTET_STRING_TAG) != VLT_OK) {
-        free(buffer);
-        printf("*** ERROR: invalid key file format, OCTET_STRING_TAG not found \n");
-        return -1;
-    }
+//     // OCTET_STRING Tag
+//     if (getTlv(&idx, buffer, &length, OCTET_STRING_TAG) != VLT_OK) {
+//         free(buffer);
+//         printf("*** ERROR: invalid key file format, OCTET_STRING_TAG not found \n");
+//         return -1;
+//     }
 
-    // Retrieve Private key value
-    VLT_PU8 pu8D = buffer+idx;
-    VLT_U16 u16DLen = length;
+//     // Retrieve Private key value
+//     VLT_PU8 pu8D = buffer+idx;
+//     VLT_U16 u16DLen = length;
 
-    VIC_LOGD("Private key");
-    VIC_LOGD_PRINT_BUFFER(pu8D, u16DLen);
+//     VIC_LOGD("Private key");
+//     VIC_LOGD_PRINT_BUFFER(pu8D, u16DLen);
 
-    idx+= length;
+//     idx+= length;
 
-    // OPTIONAL[0] - encapsulates ALGO ID
-    if (skipTlv(&idx, buffer, 0xA0) != VLT_OK) {
-        free(buffer);
-        printf("*** ERROR: invalid key file format, OPTIONAL[0] not found \n");
-        return -1;
-    }
+//     // OPTIONAL[0] - encapsulates ALGO ID
+//     if (skipTlv(&idx, buffer, 0xA0) != VLT_OK) {
+//         free(buffer);
+//         printf("*** ERROR: invalid key file format, OPTIONAL[0] not found \n");
+//         return -1;
+//     }
 
-    // OPTIONAL[1] - encapsulates public key
-    if (getTlv(&idx, buffer, &length, 0xA1) != VLT_OK) {
-        free(buffer);
-        printf("*** ERROR: invalid key file format, OPTIONAL[1] not found \n");
-        return -1;
-    }
+//     // OPTIONAL[1] - encapsulates public key
+//     if (getTlv(&idx, buffer, &length, 0xA1) != VLT_OK) {
+//         free(buffer);
+//         printf("*** ERROR: invalid key file format, OPTIONAL[1] not found \n");
+//         return -1;
+//     }
 
-    // BIT_STRING Tag
-    if (getTlv(&idx, buffer, &length, BIT_STRING_TAG) != VLT_OK) {
-        free(buffer);
-        printf("*** ERROR: invalid key file format, BIT_STRING_TAG not found \n");
-        return -1;
-    }
+//     // BIT_STRING Tag
+//     if (getTlv(&idx, buffer, &length, BIT_STRING_TAG) != VLT_OK) {
+//         free(buffer);
+//         printf("*** ERROR: invalid key file format, BIT_STRING_TAG not found \n");
+//         return -1;
+//     }
 
-    idx++; // skip nb of padding bits
+//     idx++; // skip nb of padding bits
 
-    // Check Public key starts with 0x04
-    if(buffer[idx] != 0x04) {
-        free(buffer);
-        printf("*** ERROR: invalid key file format, public key does not start with 0x04 \n");
-        return -1;
-    }
-    idx++;
+//     // Check Public key starts with 0x04
+//     if(buffer[idx] != 0x04) {
+//         free(buffer);
+//         printf("*** ERROR: invalid key file format, public key does not start with 0x04 \n");
+//         return -1;
+//     }
+//     idx++;
 
-    // Retrieve Public key value
-    VLT_U16 u16QLen = (length-2)/2;
-    VLT_PU8 pu8Qx = buffer+idx;
-    VLT_PU8 pu8Qy = buffer+idx+u16QLen;
+//     // Retrieve Public key value
+//     VLT_U16 u16QLen = (length-2)/2;
+//     VLT_PU8 pu8Qx = buffer+idx;
+//     VLT_PU8 pu8Qy = buffer+idx+u16QLen;
 
-    VIC_LOGD("Public key (Qx");
-    VIC_LOGD_PRINT_BUFFER(pu8Qx, u16QLen);
-    VIC_LOGD("Public key (Qy");
-    VIC_LOGD_PRINT_BUFFER(pu8Qy, u16QLen);
+//     VIC_LOGD("Public key (Qx");
+//     VIC_LOGD_PRINT_BUFFER(pu8Qx, u16QLen);
+//     VIC_LOGD("Public key (Qy");
+//     VIC_LOGD_PRINT_BUFFER(pu8Qy, u16QLen);
 
-    // Personalize device private key
-    VLT_FILE_PRIVILEGES PrivKeyPrivileges = {0};
-    PrivKeyPrivileges.u8Read = 0x0; // Read Forbidden
-    PrivKeyPrivileges.u8Write = (1 << TLS_USER_ID); // Only TLS user can update
-    PrivKeyPrivileges.u8Delete = (1 << TLS_USER_ID); // Only TLS user can delete
-    PrivKeyPrivileges.u8Execute = (1 << TLS_USER_ID); // Only TLS user can use
+//     // Personalize device private key
+//     VLT_FILE_PRIVILEGES PrivKeyPrivileges = {0};
+//     PrivKeyPrivileges.u8Read = 0x0; // Read Forbidden
+//     PrivKeyPrivileges.u8Write = (1 << TLS_USER_ID); // Only TLS user can update
+//     PrivKeyPrivileges.u8Delete = (1 << TLS_USER_ID); // Only TLS user can delete
+//     PrivKeyPrivileges.u8Execute = (1 << TLS_USER_ID); // Only TLS user can use
 
-    VLT_KEY_OBJECT EccKeyPriv;
-    EccKeyPriv.enKeyID = VLT_KEY_ECC_PRIV;
-    EccKeyPriv.data.EcdsaPrivKey.u16DLen = u16DLen;
-    EccKeyPriv.data.EcdsaPrivKey.pu8D = pu8D;
-    EccKeyPriv.data.EcdsaPrivKey.u8DomainParamsGroup = ECC_P256_Para_Group;
-    EccKeyPriv.data.EcdsaPrivKey.u8DomainParamsIndex = ECC_P256_Para_Index;
-    EccKeyPriv.data.EcdsaPrivKey.u8PublicKeyGroup = ECC_EK_Group;
-    EccKeyPriv.data.EcdsaPrivKey.u8PublicKeyIndex = ECC_EK_Pubk_Index;
-    EccKeyPriv.data.EcdsaPrivKey.u8Mask = 0xDE;
-    EccKeyPriv.data.EcdsaPrivKey.enAssurance = VLT_PKV_ASSURED_COMPLIANT_GENERATION;
+//     VLT_KEY_OBJECT EccKeyPriv;
+//     EccKeyPriv.enKeyID = VLT_KEY_ECC_PRIV;
+//     EccKeyPriv.data.EcdsaPrivKey.u16DLen = u16DLen;
+//     EccKeyPriv.data.EcdsaPrivKey.pu8D = pu8D;
+//     EccKeyPriv.data.EcdsaPrivKey.u8DomainParamsGroup = ECC_P256_Para_Group;
+//     EccKeyPriv.data.EcdsaPrivKey.u8DomainParamsIndex = ECC_P256_Para_Index;
+//     EccKeyPriv.data.EcdsaPrivKey.u8PublicKeyGroup = ECC_EK_Group;
+//     EccKeyPriv.data.EcdsaPrivKey.u8PublicKeyIndex = ECC_EK_Pubk_Index;
+//     EccKeyPriv.data.EcdsaPrivKey.u8Mask = 0xDE;
+//     EccKeyPriv.data.EcdsaPrivKey.enAssurance = VLT_PKV_ASSURED_COMPLIANT_GENERATION;
 
-    CHECK_STATUS("VltPutKey Device Private key",VltPutKey(ECC_EK_Group,ECC_EK_Privk_Index,&PrivKeyPrivileges,&EccKeyPriv));
+//     CHECK_STATUS("VltPutKey Device Private key",VltPutKey(ECC_EK_Group,ECC_EK_Privk_Index,&PrivKeyPrivileges,&EccKeyPriv));
 
 
-    // Personalize device public key
-    VLT_FILE_PRIVILEGES PubKeyPrivileges = {0};
-    PubKeyPrivileges.u8Read = 0xFF; // Read allowed for all users
-    PubKeyPrivileges.u8Write = (1 << TLS_USER_ID); // Only TLS user can update
-    PubKeyPrivileges.u8Delete = (1 << TLS_USER_ID); // Only TLS user can delete
-    PubKeyPrivileges.u8Execute = (1 << TLS_USER_ID); // All users can use
+//     // Personalize device public key
+//     VLT_FILE_PRIVILEGES PubKeyPrivileges = {0};
+//     PubKeyPrivileges.u8Read = 0xFF; // Read allowed for all users
+//     PubKeyPrivileges.u8Write = (1 << TLS_USER_ID); // Only TLS user can update
+//     PubKeyPrivileges.u8Delete = (1 << TLS_USER_ID); // Only TLS user can delete
+//     PubKeyPrivileges.u8Execute = (1 << TLS_USER_ID); // All users can use
 
-    VLT_KEY_OBJECT EccKeyPub;
-    EccKeyPub.enKeyID = VLT_KEY_ECC_PUB;
-    EccKeyPub.data.EcdsaPubKey.u16QLen = u16QLen;
-    EccKeyPub.data.EcdsaPubKey.pu8Qx = pu8Qx;
-    EccKeyPub.data.EcdsaPubKey.pu8Qy = pu8Qy;
-    EccKeyPub.data.EcdsaPubKey.u8DomainParamsGroup = ECC_P256_Para_Group;
-    EccKeyPub.data.EcdsaPubKey.u8DomainParamsIndex = ECC_P256_Para_Index;
-    EccKeyPub.data.EcdsaPubKey.enAssurance = VLT_PKV_ASSURED_COMPLIANT_GENERATION;
+//     VLT_KEY_OBJECT EccKeyPub;
+//     EccKeyPub.enKeyID = VLT_KEY_ECC_PUB;
+//     EccKeyPub.data.EcdsaPubKey.u16QLen = u16QLen;
+//     EccKeyPub.data.EcdsaPubKey.pu8Qx = pu8Qx;
+//     EccKeyPub.data.EcdsaPubKey.pu8Qy = pu8Qy;
+//     EccKeyPub.data.EcdsaPubKey.u8DomainParamsGroup = ECC_P256_Para_Group;
+//     EccKeyPub.data.EcdsaPubKey.u8DomainParamsIndex = ECC_P256_Para_Index;
+//     EccKeyPub.data.EcdsaPubKey.enAssurance = VLT_PKV_ASSURED_COMPLIANT_GENERATION;
 
-    CHECK_STATUS("VltPutKey Device Public key",VltPutKey(ECC_EK_Group,ECC_EK_Pubk_Index,&PubKeyPrivileges,&EccKeyPub));
+//     CHECK_STATUS("VltPutKey Device Public key",VltPutKey(ECC_EK_Group,ECC_EK_Pubk_Index,&PubKeyPrivileges,&EccKeyPub));
 
-    free(buffer);
+//     free(buffer);
 
-    return VLT_OK;
-}
+//     return VLT_OK;
+// }

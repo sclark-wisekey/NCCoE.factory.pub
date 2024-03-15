@@ -150,7 +150,8 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 	//---------------------------------------------------------------------
 	// Create a user with password authentication method.
 	//---------------------------------------------------------------------
-	VLT_U8 userPin[] = { 0x30, 0x31,0x30, 0x31,0x30, 0x31 };
+	// VLT_U8 userPin[] = { 0x30, 0x31,0x30, 0x31,0x30, 0x31 };
+	VLT_U8 userPin[] = { 0x00, 0x00,0x00, 0x00 };
 
 	// Assign the manage authentication Operation IDs 
 	structAuthSetup.enOperationID = VLT_CREATE_USER;

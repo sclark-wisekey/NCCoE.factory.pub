@@ -27,6 +27,10 @@ deviceFactoryCert.der
 **/build_factory/
 **/build_client_vaultic/
 **/build/
+**/build_perso/
+**/build_read_cert/
+**/build_keygen/
+**/.vscode
 
 # Eclipse Core
 .project
