@@ -27,6 +27,7 @@ int main(void)
 
     /* Open session with VaultIC */
     CHECK_STATUS("vlt_tls_init", vlt_tls_init());
+    printf("Init completed\n");
     
     /* Read Device certificate in VaultIC */
     VIC_LOGD("\nRead Device Certificate in VaultIC\n");

@@ -16,7 +16,7 @@
 
 #define CHECK_STATUS(label,a) {	VIC_LOGD(label);\
 								int ret_status= (a);\
-							 	if (ret_status!= VLT_OK) {VIC_LOGE("%s error %4.4x",label,ret_status);return 1;}\
+							 	if (ret_status!= VLT_OK) {VIC_LOGE("%s error %4.4x\n",label,ret_status);return 1;}\
                                 else printf("Success - %s\n", label);\
 							}
 
@@ -103,17 +103,22 @@ int main(int argc, char** argv)
     //---------------------------------------------------------------------
     CHECK_STATUS("VltSubmitPassword VLT_USER7", VltSubmitPassword(VLT_USER7, VLT_MANUFACTURER, u8ManufPasswordLength, au8ManufPassword));
 
-    // Reset State to CREATION
     //---------------------------------------------------------------------
-//    CHECK_STATUS("VltSetStatus ACTIVATED",  VltSetStatus(VLT_STATE_ACTIVATED));
 printf("VltSetStatus>>\n");
-    // CHECK_STATUS("VltSetStatus CREATION",  VltSetStatus(VLT_STATE_CREATION));
+ //  CHECK_STATUS("VltSetStatus ACTIVATED",  VltSetStatus(VLT_STATE_ACTIVATED));
+
+    // Reset State to CREATION
+    // When setting to Creation, the file system on VaultIC is cleared.
+    // This is not good when the chip is pre-provisioned and configured.
+    //CHECK_STATUS("VltSetStatus CREATION",  VltSetStatus(VLT_STATE_CREATION));
 printf("VltSetStatus<<\n");
 
 #if(VLT_ENABLE_NO_SELF_TESTS_DELAY != VLT_ENABLE)
     // Configure power on self tests
     //---------------------------------------------------------------------
-    CHECK_STATUS("VltSetConfig VLT_SET_CFG_POWERON_SELFTESTS_MODE", VltSetConfig(VLT_SET_CFG_POWERON_SELFTESTS_MODE, VLT_SET_CFG_POWERON_SELFTESTS_MODE_SZ,&selfTestsMode));
+ printf("Here 01<<\n");
+   //CHECK_STATUS("VltSetConfig VLT_SET_CFG_POWERON_SELFTESTS_MODE", VltSetConfig(VLT_SET_CFG_POWERON_SELFTESTS_MODE, VLT_SET_CFG_POWERON_SELFTESTS_MODE_SZ,&selfTestsMode));
+ printf("Here 02<<\n");
 #endif    
 
 //     // Delete user 0,1,2,3,4,5,6
@@ -163,7 +168,7 @@ printf("VltSetStatus<<\n");
 //     VIC_LOGD("Encrypted channel disabled, TLS_USER = USER%d (PIN)\n",TLS_USER_ID);
 // #endif
 
-    // CHECK_STATUS("VltManageAuthenticationData Create Tls User" , VltManageAuthenticationData(&structAuthSetup));
+    //CHECK_STATUS("VltManageAuthenticationData Create Tls User" , VltManageAuthenticationData(&structAuthSetup));
 
     // Create device cert file
     //---------------------------------------------------------------------
@@ -172,18 +177,21 @@ printf("VltSetStatus<<\n");
 
     VLT_FILE_PRIVILEGES filePrivileges;
     filePrivileges.u8Read =  0xFF; // All users allowed to read
-    filePrivileges.u8Write = 1<<TLS_USER_ID; // Only TLS user can update
+    filePrivileges.u8Write = 0xFF; // All users can update
     filePrivileges.u8Delete = 1<<TLS_USER_ID; // Only TLS user can delete
     filePrivileges.u8Execute = 1<<TLS_USER_ID; // Only TLS user can use */
 
     if(strcmp(CERTS_DIR_PATH, "/")!=0) {
         // Create Directory to store certificates
+        printf("Here03<<\n");
         VIC_LOGE("** ERROR not implemented: certificate directory\n");
         return 1;
     }
 
+    printf("Here04<<\n");
     CHECK_STATUS("Select root directory", VltSelectFileOrDirectory((VLT_PU8) CERTS_DIR_PATH, strlen(CERTS_DIR_PATH), &respData));
-    CHECK_STATUS("VltCreateFile Device cert file ",  VltCreateFile(TLS_USER_ID, 0, &filePrivileges, u8attribute, strlen(DEVICE_CERT_NAME)+1, (VLT_PU8)DEVICE_CERT_NAME));
+     printf("Here05<<\n");
+   CHECK_STATUS("VltCreateFile Device cert file ",  VltCreateFile(TLS_USER_ID, 0, &filePrivileges, u8attribute, strlen(DEVICE_CERT_NAME)+1, (VLT_PU8)DEVICE_CERT_NAME));
     // Create CA cert file
     //---------------------------------------------------------------------
     CHECK_STATUS("VltCreateFile CA cert file ",  VltCreateFile(TLS_USER_ID, 0, &filePrivileges, u8attribute, strlen(CA_CERT_NAME)+1, (VLT_PU8)CA_CERT_NAME));
