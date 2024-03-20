@@ -62,6 +62,18 @@
 #include "vaultic_csr.h"
 
 
+// Definitions for authenticaiton method
+//#define USE_SEC_CHANNEL // encryption of communication with VaultIC 
+#ifdef USE_SEC_CHANNEL
+#define TLS_USER_ID 			VLT_USER1
+#define SMAC_KEY { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F}
+#define SENC_KEY { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F}
+#else
+#define TLS_USER_ID 			VLT_USER0
+#define TLS_USER_PIN			"\0\0\0\0"
+#define TLS_USER_PIN_LEN		4
+#endif
+
 // Definitions for key generation
 //P256 parameters
 #define ECC_P256_Para_Group 	0xE0
@@ -147,33 +159,49 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 	}
 	printf("VaultIC reinitialization successful\n\n");
 
-	//---------------------------------------------------------------------
-	// Create a user with password authentication method.
-	//---------------------------------------------------------------------
-	// VLT_U8 userPin[] = { 0x30, 0x31,0x30, 0x31,0x30, 0x31 };
-	VLT_U8 userPin[] = { 0x00, 0x00,0x00, 0x00 };
 
-	// Assign the manage authentication Operation IDs 
+
+	//---------------------------------------------------------------------
+	// Create a user with selected authentication method.
+	//---------------------------------------------------------------------
+	//     // Create TLS user
+	 //---------------------------------------------------------------------
 	structAuthSetup.enOperationID = VLT_CREATE_USER;
-	// Assign the first user ID.
-	structAuthSetup.enUserID = USER_PIN_ID;
-	// Password authentication method
-	structAuthSetup.enMethod = VLT_AUTH_PASSWORD;
-	// Make the user an approved user.
-	structAuthSetup.enRoleID = VLT_NON_APPROVED_USER;
-	// Make the minimum require secure channel level the highest level possible.
-	structAuthSetup.enChannelLevel = VLT_NO_CHANNEL;
-	// Enable delete all user files if the user locks their account.
+	structAuthSetup.u8TryCount = 5;
 	structAuthSetup.enSecurityOption = VLT_NO_DELETE_ON_LOCK;
-	// Assign a small try count to prevent an attack (account locked after 3 failed authentication attempts).
-	structAuthSetup.u8TryCount = 3;
+	structAuthSetup.enUserID = TLS_USER_ID;
+	//structAuthSetup.enRoleID = VLT_APPROVED_USER;
+	structAuthSetup.enRoleID = VLT_NON_APPROVED_USER;
 
-	// Set Password value
-	memcpy(&structAuthSetup.data.password.u8Password, userPin, sizeof(userPin));
-	structAuthSetup.data.password.u8PasswordLength = (VLT_U8)sizeof(userPin);
+#ifdef USE_SEC_CHANNEL
+	// Create user 01 with SCP03 auth method
+	//---------------------------------------------------------------------
+	VLT_U8 au8S_MacStaticKey[] = SMAC_KEY;
+	VLT_U8 au8S_EncStaticKey[] = SENC_KEY;
+	structAuthSetup.enMethod = VLT_AUTH_SCP03;
+	structAuthSetup.enChannelLevel = VLT_CMAC_CENC;
+	structAuthSetup.data.secret.u8NumberOfKeys = 2;
+	structAuthSetup.data.secret.aKeys[0].enKeyID = VLT_KEY_AES_128;
+	structAuthSetup.data.secret.aKeys[0].u8Mask = 0xBE;
+	structAuthSetup.data.secret.aKeys[0].u16KeyLength = sizeof(au8S_MacStaticKey);
+	structAuthSetup.data.secret.aKeys[0].pu8Key = au8S_MacStaticKey;
+	structAuthSetup.data.secret.aKeys[1].enKeyID = VLT_KEY_AES_128;
+	structAuthSetup.data.secret.aKeys[1].u8Mask = 0xEF;
+	structAuthSetup.data.secret.aKeys[1].u16KeyLength = sizeof(au8S_EncStaticKey);
+	structAuthSetup.data.secret.aKeys[1].pu8Key = au8S_EncStaticKey;
+	printf("Encrypted channel enabled, TLS_USER = USER%d (SCP03)\n", TLS_USER_ID);
+#else
+	// Create user 00 with password auth method
+	//---------------------------------------------------------------------
+	structAuthSetup.enMethod = VLT_AUTH_PASSWORD;
+	structAuthSetup.enChannelLevel = VLT_NO_CHANNEL;
+	structAuthSetup.data.password.u8PasswordLength = TLS_USER_PIN_LEN;
+	memset(structAuthSetup.data.password.u8Password, 0x00, sizeof(structAuthSetup.data.password.u8Password));
+	memcpy(structAuthSetup.data.password.u8Password, (VLT_PU8)TLS_USER_PIN, TLS_USER_PIN_LEN);
+	printf("Encrypted channel disabled, TLS_USER = USER%d (PIN)\n", TLS_USER_ID);
+#endif
 
-	if (VLT_OK != (usActualSW = VltManageAuthenticationData(
-		&structAuthSetup)))
+	if (VLT_OK != (usActualSW = VltManageAuthenticationData(&structAuthSetup)))
 		CloseAndExit(usActualSW, "User creation failed");
 
 	//---------------------------------------------------------------------
@@ -192,11 +220,41 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 	//---------------------------------------------------------------------
 	// Login as user 0.  
 	//---------------------------------------------------------------------
-	if (VLT_OK != (usActualSW = VltSubmitPassword(VLT_USER0,
-		VLT_NON_APPROVED_USER,
-		sizeof(userPin),
-		(VLT_U8*)userPin)))
+#ifdef USE_SEC_CHANNEL
+	// Authenticate User 1 with SCP03
+	unsigned char aucS_MacStaticKey[] = SMAC_KEY;
+	unsigned char aucS_EncStaticKey[] = SENC_KEY;
+
+	KEY_BLOB kblMacStatic;
+	kblMacStatic.keyType = VLT_KEY_AES_128;
+	kblMacStatic.keySize = sizeof(aucS_MacStaticKey);
+	kblMacStatic.keyValue = aucS_MacStaticKey;
+
+	KEY_BLOB kblEncStatic;
+	kblEncStatic.keyType = VLT_KEY_AES_128;
+	kblEncStatic.keySize = sizeof(aucS_EncStaticKey);
+	kblEncStatic.keyValue = aucS_EncStaticKey;
+
+	KEY_BLOB_ARRAY theKeyBlobs = { 0 };
+	theKeyBlobs.u8ArraySize = 2;
+	theKeyBlobs.pKeys[0] = &kblMacStatic;
+	theKeyBlobs.pKeys[1] = &kblEncStatic;
+
+	if (VLT_OK != (usActualSW = VltAuthInit(VLT_AUTH_SCP03, TLS_USER_ID, VLT_NON_APPROVED_USER, VLT_CMAC_CENC_RMAC_RENC, theKeyBlobs)))
+		CloseAndExit(usActualSW, "VltAuthInit TLS User failed");
+	//CHECK_APDU("VltAuthInit TLS User", VltAuthInit(VLT_AUTH_SCP03, TLS_USER_ID, VLT_NON_APPROVED_USER, VLT_CMAC_CENC_RMAC_RENC, theKeyBlobs));
+#else
+	// Authenticate User 0 with password
+	VLT_U8 u8UserPassword[20];
+	host_memset(u8UserPassword, 0x00, 20);
+	host_memcpy(u8UserPassword, (VLT_PU8)TLS_USER_PIN, TLS_USER_PIN_LEN);
+
+	//CHECK_APDU("VltSubmitPassword TLS User", VltSubmitPassword(TLS_USER_ID, VLT_NON_APPROVED_USER, TLS_USER_PIN_LEN, u8UserPassword));
+	//if (VLT_OK != (usActualSW = VltSubmitPassword(VLT_USER0, VLT_NON_APPROVED_USER, sizeof(userPin), (VLT_U8*)userPin)))
+	if (VLT_OK != (usActualSW = VltSubmitPassword(TLS_USER_ID, VLT_NON_APPROVED_USER, TLS_USER_PIN_LEN, u8UserPassword)))
 		CloseAndExit(usActualSW, "Logging as user 0 failed");
+#endif
+
 
 	// Define the curve to be P256
 	VLT_ECC_ID curveId = VLT_ECC_ID_P256;
@@ -259,21 +317,13 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 		if (VLT_OK != (usActualSW = VltWriteText(pBase64Csr, sFilename, (VLT_U8*)"start.csr")))
 			CloseAndExit(usActualSW, "VltWriteText CSR failed");
 
-		// HexText
-		//VLT_U16 lenHexText = (3 * MAXLEN_CSR) + 16;
-		//VLT_U8 pHexText[(3 * MAXLEN_CSR) + 16] = { 0 };
-		//if (VLT_OK != (usActualSW = GetHexText(pCsr, lenCsr, pHexText, &lenHexText)))
-		//	CloseAndExit(usActualSW, "GetHexText failed");
-		//if (VLT_OK != (usActualSW = VltWriteText(pHexText, sFilename, "start.hex.txt")))
-		//	CloseAndExit(usActualSW, "VltWriteText HexText failed");
-
 		//---------------------------------------------------------------------
 		// Create ECDSA domain params 
 		//---------------------------------------------------------------------
 		VLT_KEY_OBJECT domainParams;
 		VLT_U8 domainGrp = ECC_P256_Para_Group;
 		VLT_U8 domainIdx = ECC_P256_Para_Index;
-		if (VLT_OK != (usActualSW = VltCreateEcdsaDomainParams(USER_PIN_ID, curveId, domainGrp, domainIdx, &domainParams)))
+		if (VLT_OK != (usActualSW = VltCreateEcdsaDomainParams(TLS_USER_ID, curveId, domainGrp, domainIdx, &domainParams)))
 			CloseAndExit(usActualSW, "Set Key Obj Domain Params failed");
 
 		//---------------------------------------------------------------------
@@ -290,7 +340,7 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 		genPub.u8DomainParamsGroup = domainGrp;
 		genPub.u8DomainParamsIndex = domainIdx;
 		genPub.u16QLen = domainParams.data.EcdsaParamsKey.u16NLen;
-		if (VLT_OK != (usActualSW = VltGenKey(USER_PIN_ID, curveId,genGrp, genPubIdx, genPrivIdx, &genPub)))
+		if (VLT_OK != (usActualSW = VltGenKey(TLS_USER_ID, curveId,genGrp, genPubIdx, genPrivIdx, &genPub)))
 			CloseAndExit(usActualSW, "Generate ECC keypair failed");
 
 		printf("PubKeyX (VaultIC)");
@@ -337,22 +387,6 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 
 		printf("[CSR]");
 		PrintHexBuffer(pCsr, lenCsr);
-
-		//---------------------------------------------------------------------
-		// Write the data to HexText and ASN.1 files
-		//---------------------------------------------------------------------
-		// ASN
-		//if (VLT_OK != (usActualSW = VltWriteDataBuffer(pCsr, lenCsr, sFilename, "asn")))
-		//	CloseAndExit(usActualSW, "Build Base64 CSR failed");
-
-		// HexText
-		//VLT_U16 lenCsrHexText = (3 * MAXLEN_CSR) + 16;
-		//VLT_U8 pCsrHexText[(3 * MAXLEN_CSR) + 16] = { 0 };
-		//if (VLT_OK != (usActualSW = GetHexText(pCsr, lenCsr, pCsrHexText, &lenCsrHexText)))
-		//	CloseAndExit(usActualSW, "GetHexText failed");
-		//if (VLT_OK != (usActualSW = VltWriteText(pCsrHexText, sFilename, "hex.txt")))
-		//	CloseAndExit(usActualSW, "VltWriteText HexText failed");
-
 
 		//---------------------------------------------------------------------
 		// Base 64 Encode Merged CSR
