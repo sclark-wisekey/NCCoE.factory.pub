@@ -62,6 +62,8 @@
 #include "ini.h"
 #include "vaultic_csr.h"
 
+// Demo definitions
+//#define DEMO_RESET // This will delete the use after completing the demo
 
 // Definitions for authenticaiton method
 #define USE_SEC_CHANNEL // encryption of communication with VaultIC 
@@ -407,13 +409,14 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 #endif
 	} while (0);
 
-	printf("End of demo - reinitializing VaultIC \n");
 	//---------------------------------------------------------------------
 	// Log out 
 	//---------------------------------------------------------------------
 	if (VLT_OK != (usActualSW = VltCancelAuthentication()))
 		CloseAndExit(usActualSW, "De-authentication failed");
 
+#ifdef DEMO_RESET
+	printf("End of demo - reinitializing VaultIC \n");
 	//---------------------------------------------------------------------
 	// Log back in as the manufacturer.  
 	//---------------------------------------------------------------------
@@ -443,6 +446,7 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 		CloseAndExit(usActualSW, "De-authentication failed");
 
 	printf("VaultIC Reinit complete \n\n");
+#endif
 
 	CloseAndExit(usActualSW, "Key CSR demo successful !!!");
 }
@@ -451,114 +455,3 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 
 
 
-
-/*
-
-
-
-/**
- * \brief Creates a CSR specified by the CSR definition from the ATECC508A device.
- *        This process involves reading the dynamic CSR data from the device and combining it
- *        with the template found in the CSR definition, then signing it. Return the CSR int der format
- * \param[in]    csr_def   CSR definition describing where to find the dynamic CSR information
- *                         on the device and how to incorporate it into the template.
- * \param[out]   csr       Buffer to receive the CSR.
- * \param[in,out] csr_size  As input, the size of the CSR buffer in bytes.
- *                         As output, the size of the CSR returned in cert in bytes.
- * \return ATCA_SUCCESS on success, otherwise an error code.
- */
-
-
-//int vaultic_build_csr(const atcacert_def_t* csr_def, uint8_t* csr, size_t* csr_size)
-//{
-//	ATCA_STATUS status = ATCA_SUCCESS;
-//	uint8_t pub_key[ATCA_PUB_KEY_SIZE] = { 0 };
-//	uint8_t sig[ATCA_SIG_SIZE] = { 0 };
-//	const atcacert_device_loc_t* pub_dev_loc = NULL;
-//	const atcacert_cert_loc_t* pub_loc = NULL;
-//	uint16_t key_slot = 0;
-//	uint16_t priv_key_slot = 0;
-//	uint8_t tbs_digest[ATCA_BLOCK_SIZE] = { 0 };
-//	size_t csr_max_size = 0;
-//
-//	do
-//	{
-//		// Check the pointers
-//		if (csr_def == NULL || csr == NULL || csr == NULL || csr_size == NULL)
-//		{
-//			status = ATCACERT_E_BAD_PARAMS;
-//			ATCA_TRACE(status, "Null input parameter"); break;
-//		}
-//		// Check the csr buffer size
-//		if (*csr_size < csr_def->cert_template_size)
-//		{
-//			status = ATCACERT_E_BUFFER_TOO_SMALL;
-//			ATCA_TRACE(status, "CSR buffer size too small"); break;
-//		}
-//		// Copy the CSR template into the CSR that will be returned
-//		memcpy(csr, csr_def->cert_template, csr_def->cert_template_size);
-//		csr_max_size = *csr_size;
-//		*csr_size = csr_def->cert_template_size;
-//
-//		// Get a few elements from the csr_def structure
-//		pub_loc = &(csr_def->std_cert_elements[STDCERT_PUBLIC_KEY]);
-//		pub_dev_loc = &(csr_def->public_key_dev_loc);
-//		key_slot = pub_dev_loc->slot;
-//		priv_key_slot = csr_def->private_key_slot;
-//
-//		// Get the public key from the device
-//		if (pub_dev_loc->is_genkey)
-//		{
-//			// Calculate the public key from the private key
-//			status = atcab_get_pubkey(key_slot, pub_key);
-//			if (status != ATCA_SUCCESS)
-//			{
-//				ATCA_TRACE(status, "Could not generate public key"); break;
-//			}
-//		}
-//		else
-//		{
-//			// Read the public key from a slot
-//			status = atcab_read_pubkey(key_slot, pub_key);
-//			if (status != ATCA_SUCCESS)
-//			{
-//				ATCA_TRACE(status, "Could not read public key"); break;
-//			}
-//		}
-//		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>
-//		// Insert the public key into the CSR template
-//		status = atcacert_set_cert_element(csr_def, pub_loc, csr, *csr_size, pub_key, ATCA_PUB_KEY_SIZE);
-//		if (status != ATCA_SUCCESS)
-//		{
-//			ATCA_TRACE(status, "Setting CSR public key failed"); break;
-//		}
-//
-//		// Get the CSR TBS digest
-//		status = atcacert_get_tbs_digest(csr_def, csr, *csr_size, tbs_digest);
-//		if (status != ATCA_SUCCESS)
-//		{
-//			ATCA_TRACE(status, "Get TBS digest failed"); break;
-//		}
-//
-//		// Sign the TBS digest
-//		status = atcab_sign(priv_key_slot, tbs_digest, sig);
-//		if (status != ATCA_SUCCESS)
-//		{
-//			ATCA_TRACE(status, "Signing CSR failed"); break;
-//		}
-//
-//		// Insert the signature into the CSR template
-//		status = atcacert_set_signature(csr_def, csr, csr_size, csr_max_size, sig);
-//		if (status != ATCA_SUCCESS)
-//		{
-//			ATCA_TRACE(status, "Setting CSR signature failed"); break;
-//		}
-//
-//		// The exact size of the csr cannot be determined until after adding the signature
-//		// it is returned in the csr_size parameter.  (*csr_size = *csr_size;)
-//		// <<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//
-//	} while (0);
-//
-//	return status;
-//}
