@@ -56,6 +56,7 @@
 #include "vaultic_common.h"
 #include "vaultic_api.h"
 #include "vaultic_ecdsa_signer.h"
+#include "vaultic_identity_authentication.h"
 #include "vaultic_HMAC.h"
 #include "common.h"
 #include "ini.h"
@@ -63,7 +64,7 @@
 
 
 // Definitions for authenticaiton method
-//#define USE_SEC_CHANNEL // encryption of communication with VaultIC 
+#define USE_SEC_CHANNEL // encryption of communication with VaultIC 
 #ifdef USE_SEC_CHANNEL
 #define TLS_USER_ID 			VLT_USER1
 #define SMAC_KEY { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F}
@@ -120,15 +121,8 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 	//---------------------------------------------------------------------
 	// Login as the manufacturer.
 	//---------------------------------------------------------------------
-//#ifndef _WIN32
-//	strcpy(test_params->au8ManufPassword, pw);
-//#endif // !_WIN32
-
 	printf("\nVaultIC reinitialization in progress ...\n");
-	if (VLT_OK != (usActualSW = VltSubmitPassword(VLT_USER7,
-		VLT_MANUFACTURER,
-		test_params->u8ManufPasswordLength,
-		test_params->au8ManufPassword)))
+	if (VLT_OK != (usActualSW = VltSubmitPassword(VLT_USER7, VLT_MANUFACTURER, test_params->u8ManufPasswordLength, test_params->au8ManufPassword)))
 	{
 		CloseAndExit(usActualSW, "VltSubmitPassword Manuf password");
 	}
@@ -218,7 +212,7 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 		CloseAndExit(usActualSW, "Cancel authentication failed");
 
 	//---------------------------------------------------------------------
-	// Login as user 0.  
+	// Login as TLS user
 	//---------------------------------------------------------------------
 #ifdef USE_SEC_CHANNEL
 	// Authenticate User 1 with SCP03
@@ -423,10 +417,7 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 	//---------------------------------------------------------------------
 	// Log back in as the manufacturer.  
 	//---------------------------------------------------------------------
-	if (VLT_OK != (usActualSW = VltSubmitPassword(VLT_USER7,
-		VLT_MANUFACTURER,
-		test_params->u8ManufPasswordLength,
-		test_params->au8ManufPassword)))
+	if (VLT_OK != (usActualSW = VltSubmitPassword(VLT_USER7, VLT_MANUFACTURER, test_params->u8ManufPasswordLength, test_params->au8ManufPassword)))
 		CloseAndExit(usActualSW, "Manufacturer authentication failed");
 
 	//---------------------------------------------------------------------
