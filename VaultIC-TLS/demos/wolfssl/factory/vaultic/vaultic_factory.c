@@ -107,20 +107,6 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 	}
 
 	//---------------------------------------------------------------------
-	// Get the device information
-	//---------------------------------------------------------------------
-	VLT_TARGET_INFO targetInfo;
-
-	if (VLT_OK != (usActualSW = VltGetInfo(&targetInfo)))
-	{
-		CloseAndExit(usActualSW, "VltGetInfo");
-	}
-
-	//
-	// Report the device name.
-	printf("The Target Name: %s\n", targetInfo.au8Firmware);
-
-	//---------------------------------------------------------------------
 	// Login as the manufacturer.
 	//---------------------------------------------------------------------
 //#ifndef _WIN32
@@ -136,6 +122,20 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 		CloseAndExit(usActualSW, "VltSubmitPassword Manuf password");
 	}
 	printf("Authenticate as Manufacturer successful\n");
+
+	//---------------------------------------------------------------------
+	// Get the device information
+	//---------------------------------------------------------------------
+	VLT_TARGET_INFO targetInfo;
+
+	if (VLT_OK != (usActualSW = VltGetInfo(&targetInfo)))
+	{
+		CloseAndExit(usActualSW, "VltGetInfo");
+	}
+
+	//
+	// Report the device name.
+	printf("The Target Name: %s\n", targetInfo.au8Firmware);
 
 	//---------------------------------------------------------------------
 	// Transition to the creation state.

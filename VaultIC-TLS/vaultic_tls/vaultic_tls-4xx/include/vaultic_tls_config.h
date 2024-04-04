@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 /* VaultIC configuration */
-//#define USE_SEC_CHANNEL	/* encryption of communication with VaultIC */
+#define USE_SEC_CHANNEL	/* encryption of communication with VaultIC */
 
 #define SELF_TESTS_DELAY 		700 // 0.7s VaultIC boot starting delay
 

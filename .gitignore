@@ -29,8 +29,10 @@ deviceFactoryCert.der
 **/build/
 **/build_perso/
 **/build_read_cert/
+**/build_sign/
 **/build_keygen/
 **/.vscode
+**/build_client/
 
 # Eclipse Core
 .project

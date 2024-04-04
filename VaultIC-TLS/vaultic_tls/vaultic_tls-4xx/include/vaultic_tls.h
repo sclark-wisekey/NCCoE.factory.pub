@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #ifndef VAULTIC_LOG_LEVEL
-#define VAULTIC_LOG_LEVEL 0
+#define VAULTIC_LOG_LEVEL 2
 #endif
 
 #if(VAULTIC_LOG_LEVEL>0)

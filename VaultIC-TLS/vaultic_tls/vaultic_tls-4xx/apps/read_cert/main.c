@@ -25,11 +25,11 @@ int main(void)
    printf("Reading certificate from the VaultIC\n");
    printf("---------------------------------------------\n");
 
-    /* Open session with VaultIC */
+    // Open session with VaultIC
     CHECK_STATUS("vlt_tls_init", vlt_tls_init());
     printf("Init completed\n");
     
-    /* Read Device certificate in VaultIC */
+    // Read Device certificate in VaultIC
     VIC_LOGD("\nRead Device Certificate in VaultIC\n");
     sizeof_device_cert = vlt_tls_get_cert_size(SSL_VIC_DEVICE_CERT);
     if (sizeof_device_cert > 0) {
@@ -43,7 +43,7 @@ int main(void)
     	VIC_LOGE("(no Device Certificate found in VaultIC)\n");
     }
     
-    /* Read CA certificate in VaultIC */
+    // Read CA certificate in VaultIC
     VIC_LOGD("\nRead CA Certificate in VaultIC\n");
     sizeof_ca_cert = vlt_tls_get_cert_size(SSL_VIC_CA_CERT);
     if (sizeof_ca_cert > 0) {
@@ -60,7 +60,7 @@ int main(void)
     if(ca_cert != NULL) free(ca_cert);
     if(device_cert != NULL)free(device_cert);
 
-    /* Close session with VaultIC */
+    // Close session with VaultIC
     CHECK_STATUS("vlt_tls_close", vlt_tls_close());
 
     return 0;
