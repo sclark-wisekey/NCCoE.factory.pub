@@ -65,7 +65,7 @@
 // Demo definitions
 //#define DEMO_RESET // This will delete the use after completing the demo
 
-// Definitions for authentication method
+// Definitions for authenticaiton method
 #define USE_SEC_CHANNEL // encryption of communication with VaultIC 
 #ifdef USE_SEC_CHANNEL
 #define TLS_USER_ID 			VLT_USER1
@@ -109,15 +109,8 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 	//---------------------------------------------------------------------
 	// Login as the manufacturer.
 	//---------------------------------------------------------------------
-//#ifndef _WIN32
-//	strcpy(test_params->au8ManufPassword, pw);
-//#endif // !_WIN32
-
 	printf("\nVaultIC reinitialization in progress ...\n");
-	if (VLT_OK != (usActualSW = VltSubmitPassword(VLT_USER7,
-		VLT_MANUFACTURER,
-		test_params->u8ManufPasswordLength,
-		test_params->au8ManufPassword)))
+	if (VLT_OK != (usActualSW = VltSubmitPassword(VLT_USER7, VLT_MANUFACTURER, test_params->u8ManufPasswordLength, test_params->au8ManufPassword)))
 	{
 		CloseAndExit(usActualSW, "VltSubmitPassword Manuf password");
 	}
@@ -221,7 +214,7 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 		CloseAndExit(usActualSW, "Cancel authentication failed");
 
 	//---------------------------------------------------------------------
-	// Login as user 0.  
+	// Login as TLS user
 	//---------------------------------------------------------------------
 #ifdef USE_SEC_CHANNEL
 	// Authenticate User 1 with SCP03
@@ -427,10 +420,7 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 	//---------------------------------------------------------------------
 	// Log back in as the manufacturer.  
 	//---------------------------------------------------------------------
-	if (VLT_OK != (usActualSW = VltSubmitPassword(VLT_USER7,
-		VLT_MANUFACTURER,
-		test_params->u8ManufPasswordLength,
-		test_params->au8ManufPassword)))
+	if (VLT_OK != (usActualSW = VltSubmitPassword(VLT_USER7, VLT_MANUFACTURER, test_params->u8ManufPasswordLength, test_params->au8ManufPassword)))
 		CloseAndExit(usActualSW, "Manufacturer authentication failed");
 
 	//---------------------------------------------------------------------
