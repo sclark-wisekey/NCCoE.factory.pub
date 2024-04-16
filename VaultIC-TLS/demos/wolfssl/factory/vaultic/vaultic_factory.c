@@ -155,8 +155,6 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 	}
 	printf("VaultIC reinitialization successful\n\n");
 
-
-
 	//---------------------------------------------------------------------
 	// Create a user with selected authentication method.
 	//---------------------------------------------------------------------
@@ -250,7 +248,6 @@ int VaultIC_Factory_CSR(TEST_PARAMS_T * test_params, config_values_t config)
 	if (VLT_OK != (usActualSW = VltSubmitPassword(TLS_USER_ID, VLT_NON_APPROVED_USER, TLS_USER_PIN_LEN, u8UserPassword)))
 		CloseAndExit(usActualSW, "Logging as user 0 failed");
 #endif
-
 
 	// Define the curve to be P256
 	VLT_ECC_ID curveId = VLT_ECC_ID_P256;

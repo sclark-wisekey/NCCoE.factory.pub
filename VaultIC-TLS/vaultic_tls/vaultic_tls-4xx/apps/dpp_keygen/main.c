@@ -35,7 +35,7 @@
 #define TLS_USER_PIN_LEN		4
 #endif
 
-// function definitions
+// API function definitions
 VLT_STS VltCreateEcdsaDomainParams(VLT_USER_ID userId, VLT_ECC_ID curveId, VLT_U8 domainKeyGroup, VLT_U8 domainKeyIndex, VLT_KEY_OBJECT* pDomainParams);
 VLT_STS VltGenKey(VLT_USER_ID userId, VLT_ECC_ID curveId, VLT_U8 genGrp, VLT_U8 genPubIdx, VLT_U8 genPrivIdx, VLT_KEY_OBJ_ECDSA_PUB* pGenPub);
 
@@ -57,7 +57,6 @@ int main (int argc, char **argv)
     VLT_TARGET_INFO tInfo;
     VLT_INIT_COMMS_PARAMS commsParams;
     VLT_MANAGE_AUTH_DATA structAuthSetup;
-    VLT_U8 userPin[] = {0x30, 0x31, 0x30, 0x31, 0x30, 0x31};
     char *szManuf, *szInterface, *c;
     int i;
 
@@ -123,7 +122,6 @@ int main (int argc, char **argv)
 	structAuthSetup.u8TryCount = 5;
 	structAuthSetup.enSecurityOption = VLT_NO_DELETE_ON_LOCK;
 	structAuthSetup.enUserID = TLS_USER_ID;
-	//structAuthSetup.enRoleID = VLT_APPROVED_USER;
 	structAuthSetup.enRoleID = VLT_NON_APPROVED_USER;
 
 #ifdef USE_SEC_CHANNEL
@@ -197,15 +195,12 @@ int main (int argc, char **argv)
 
 	if (VLT_OK != (vltStatus = VltAuthInit(VLT_AUTH_SCP03, TLS_USER_ID, VLT_NON_APPROVED_USER, VLT_CMAC_CENC_RMAC_RENC, theKeyBlobs)))
 		CloseAndExit(vltStatus, "VltAuthInit TLS User failed");
-	//CHECK_APDU("VltAuthInit TLS User", VltAuthInit(VLT_AUTH_SCP03, TLS_USER_ID, VLT_NON_APPROVED_USER, VLT_CMAC_CENC_RMAC_RENC, theKeyBlobs));
 #else
 	// Authenticate User 0 with password
 	VLT_U8 u8UserPassword[20];
 	host_memset(u8UserPassword, 0x00, 20);
 	host_memcpy(u8UserPassword, (VLT_PU8)TLS_USER_PIN, TLS_USER_PIN_LEN);
 
-	//CHECK_APDU("VltSubmitPassword TLS User", VltSubmitPassword(TLS_USER_ID, VLT_NON_APPROVED_USER, TLS_USER_PIN_LEN, u8UserPassword));
-	//if (VLT_OK != (vltStatus = VltSubmitPassword(VLT_USER0, VLT_NON_APPROVED_USER, sizeof(userPin), (VLT_U8*)userPin)))
 	if (VLT_OK != (vltStatus = VltSubmitPassword(TLS_USER_ID, VLT_NON_APPROVED_USER, TLS_USER_PIN_LEN, u8UserPassword)))
 		CloseAndExit(vltStatus, "Logging as user 0 failed");
 #endif
@@ -228,6 +223,11 @@ int main (int argc, char **argv)
     VLT_U8 genGrp = ECC_EK_Group;
     VLT_U8 genPubIdx = ECC_EK_Pubk_Index;
     VLT_U8 genPrivIdx = ECC_EK_Privk_Index;
+    genPub.pu8Qx = pX;
+    genPub.pu8Qy = pY;
+    genPub.u8DomainParamsGroup = domainGrp;
+    genPub.u8DomainParamsIndex = domainIdx;
+    genPub.u16QLen = domainParams.data.EcdsaParamsKey.u16NLen;
 
 
     //genPub.u16QLen = P256_BYTE_SZ; //domainParams.data.EcdsaParamsKey.u16NLen;

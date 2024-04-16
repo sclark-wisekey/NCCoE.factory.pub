@@ -76,8 +76,9 @@ int main(int argc, char** argv)
         CHECK_STATUS("Compute Signature", vlt_tls_compute_signature_P256(buffer, lSize, pu8SigR, pu8SigS));
         if (ret ==0)
         {
-            VIC_LOGD("Signature\n");
+            printf("\nSignature\nR:");
             VIC_LOGD_PRINT_BUFFER(pu8SigR, P256_BYTE_SZ);
+            printf("\nS:");
             VIC_LOGD_PRINT_BUFFER(pu8SigS, P256_BYTE_SZ);
         }
         else 

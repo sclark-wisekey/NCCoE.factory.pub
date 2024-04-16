@@ -16,18 +16,12 @@
 
 #define CHECK_STATUS(label,a) {	VIC_LOGD(label);\
 								int ret_status= (a);\
-<<<<<<< HEAD
 							 	if (ret_status!= VLT_OK)\
                                 {\
                                     VIC_LOGE("%s error %4.4x\n",label,ret_status);\
                                     printf("%s error %4.4x\n",label,ret_status);return 1;\
                                 }\
                                 else printf("Success - %s\n", label);}\
-=======
-							 	if (ret_status!= VLT_OK) {VIC_LOGE("%s error %4.4x",label,ret_status);return 1;}\
-                                else printf("Success - %s\n", label);\
-							}
->>>>>>> a659e4f61ed653f108f5e2ca1f2666cc538dc7ee
 
 void GetManufPwd(unsigned char *buffer, unsigned char *length);
 int vlt_copy_file(const char *dest_vic_file, const char *src_file);
@@ -105,7 +99,6 @@ int main(int argc, char** argv)
 	unsigned char aucS_MacStaticKey[] = SMAC_KEY;
 	unsigned char aucS_EncStaticKey[] = SENC_KEY;
 
-<<<<<<< HEAD
 	KEY_BLOB kblMacStatic;
 	kblMacStatic.keyType = VLT_KEY_AES_128;
 	kblMacStatic.keySize = sizeof(aucS_MacStaticKey);
@@ -137,69 +130,6 @@ int main(int argc, char** argv)
     //---------------------------------------------------------------------
     CHECK_STATUS("VltGetInfo" , VltGetInfo(&chipInfo));
     VIC_LOGD("%s\n",chipInfo.au8Firmware);
-=======
-    // Reset State to CREATION
-    //---------------------------------------------------------------------
-//    CHECK_STATUS("VltSetStatus ACTIVATED",  VltSetStatus(VLT_STATE_ACTIVATED));
-printf("VltSetStatus>>\n");
-    // CHECK_STATUS("VltSetStatus CREATION",  VltSetStatus(VLT_STATE_CREATION));
-printf("VltSetStatus<<\n");
-
-#if(VLT_ENABLE_NO_SELF_TESTS_DELAY != VLT_ENABLE)
-    // Configure power on self tests
-    //---------------------------------------------------------------------
-    CHECK_STATUS("VltSetConfig VLT_SET_CFG_POWERON_SELFTESTS_MODE", VltSetConfig(VLT_SET_CFG_POWERON_SELFTESTS_MODE, VLT_SET_CFG_POWERON_SELFTESTS_MODE_SZ,&selfTestsMode));
-#endif    
-
-//     // Delete user 0,1,2,3,4,5,6
-//     //    (user 7 is the manufacturer DO NOT DELETE IT)
-//     //---------------------------------------------------------------------
-//     VLT_MANAGE_AUTH_DATA structAuthSetup;
-//     structAuthSetup.enOperationID = VLT_DELETE_USER;
-//     structAuthSetup.enUserID = VLT_USER0;
-//     for ( VLT_USER_ID i = VLT_USER0; i <= VLT_USER6; i++) {
-//         structAuthSetup.enUserID = i;
-//         VltManageAuthenticationData(&structAuthSetup);
-//     }
-
-//     // Create TLS user
-//     //---------------------------------------------------------------------
-//     structAuthSetup.enOperationID = VLT_CREATE_USER;
-//     structAuthSetup.u8TryCount = 5;
-//     structAuthSetup.enSecurityOption = VLT_NO_DELETE_ON_LOCK;
-//     structAuthSetup.enUserID = TLS_USER_ID;
-//     structAuthSetup.enRoleID = VLT_NON_APPROVED_USER;
-
-// #ifdef USE_SEC_CHANNEL
-//     // SCP03 auth method
-//     //---------------------------------------------------------------------
-//     VLT_U8 au8S_MacStaticKey[] = SMAC_KEY;
-//     VLT_U8 au8S_EncStaticKey[] = SENC_KEY;
-//     structAuthSetup.enMethod = VLT_AUTH_SCP03;
-//     structAuthSetup.enChannelLevel = VLT_CMAC_CENC;
-//     structAuthSetup.data.secret.u8NumberOfKeys = 2;
-//     structAuthSetup.data.secret.aKeys[0].enKeyID = VLT_KEY_AES_128;
-//     structAuthSetup.data.secret.aKeys[0].u8Mask = 0xBE;
-//     structAuthSetup.data.secret.aKeys[0].u16KeyLength = sizeof(au8S_MacStaticKey);
-//     structAuthSetup.data.secret.aKeys[0].pu8Key = au8S_MacStaticKey;
-//     structAuthSetup.data.secret.aKeys[1].enKeyID = VLT_KEY_AES_128;
-//     structAuthSetup.data.secret.aKeys[1].u8Mask = 0xEF;
-//     structAuthSetup.data.secret.aKeys[1].u16KeyLength = sizeof(au8S_EncStaticKey);
-//     structAuthSetup.data.secret.aKeys[1].pu8Key = au8S_EncStaticKey;
-//     VIC_LOGD("Encrypted channel enabled, TLS_USER = USER%d (SCP03)\n",TLS_USER_ID);
-// #else
-//     // Create user 00 with password auth method
-//     //---------------------------------------------------------------------
-//     structAuthSetup.enMethod = VLT_AUTH_PASSWORD;
-//     structAuthSetup.enChannelLevel = VLT_NO_CHANNEL;
-//     structAuthSetup.data.password.u8PasswordLength = TLS_USER_PIN_LEN;
-//     memset(structAuthSetup.data.password.u8Password, 0x00, sizeof (structAuthSetup.data.password.u8Password));
-//     memcpy(structAuthSetup.data.password.u8Password, (VLT_PU8) TLS_USER_PIN, TLS_USER_PIN_LEN);
-//     VIC_LOGD("Encrypted channel disabled, TLS_USER = USER%d (PIN)\n",TLS_USER_ID);
-// #endif
-
-    // CHECK_STATUS("VltManageAuthenticationData Create Tls User" , VltManageAuthenticationData(&structAuthSetup));
->>>>>>> a659e4f61ed653f108f5e2ca1f2666cc538dc7ee
 
     // Create device cert file
     //---------------------------------------------------------------------
@@ -209,15 +139,9 @@ printf("VltSetStatus<<\n");
 
     VLT_FILE_PRIVILEGES filePrivileges;
     filePrivileges.u8Read =  0xFF; // All users allowed to read
-<<<<<<< HEAD
     filePrivileges.u8Write = 0xFF; // All users can update
     filePrivileges.u8Delete = 0xFF; // All users can delete
     filePrivileges.u8Execute = 0xFF; // All users can use */
-=======
-    filePrivileges.u8Write = 1<<TLS_USER_ID; // Only TLS user can update
-    filePrivileges.u8Delete = 1<<TLS_USER_ID; // Only TLS user can delete
-    filePrivileges.u8Execute = 1<<TLS_USER_ID; // Only TLS user can use */
->>>>>>> a659e4f61ed653f108f5e2ca1f2666cc538dc7ee
 
     if(strcmp(CERTS_DIR_PATH, "/")!=0) {
         // Create Directory to store certificates
@@ -225,7 +149,6 @@ printf("VltSetStatus<<\n");
         return 1;
     }
 
-<<<<<<< HEAD
     // Select the VaultIC root directory
     //---------------------------------------------------------------------
     CHECK_STATUS("Select root directory", VltSelectFileOrDirectory((VLT_PU8) CERTS_DIR_PATH, strlen(CERTS_DIR_PATH), &respData));
@@ -243,10 +166,6 @@ printf("VltSetStatus<<\n");
         printf("VltCreateFile Device cert file error %4.4x\n", usStatus);
     }
 
-=======
-    CHECK_STATUS("Select root directory", VltSelectFileOrDirectory((VLT_PU8) CERTS_DIR_PATH, strlen(CERTS_DIR_PATH), &respData));
-    CHECK_STATUS("VltCreateFile Device cert file ",  VltCreateFile(TLS_USER_ID, 0, &filePrivileges, u8attribute, strlen(DEVICE_CERT_NAME)+1, (VLT_PU8)DEVICE_CERT_NAME));
->>>>>>> a659e4f61ed653f108f5e2ca1f2666cc538dc7ee
     // Create CA cert file
     //---------------------------------------------------------------------
     usStatus = VltCreateFile(TLS_USER_ID, 0, &filePrivileges, u8attribute, strlen(CA_CERT_NAME)+1, (VLT_PU8)CA_CERT_NAME);
