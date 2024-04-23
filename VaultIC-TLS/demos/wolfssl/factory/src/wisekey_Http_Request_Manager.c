@@ -143,7 +143,6 @@ int httpsRequestWolf(char*clientCertPath,char*clientKeyPath)
         return ret;
     }
     wolfSSL_Debugging_ON();
-    
 
     /*---------------------------------*/
     /* Start of wolfSSL initialization and configuration */

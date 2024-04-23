@@ -5,6 +5,7 @@
 #include "vaultic_structs.h"
 #include "vaultic_identity_authentication.h"
 #include <stdio.h>
+#include <string.h>
 
 // Definitions for key generation
 //P256 parameters
@@ -24,7 +25,7 @@
 #define VLT_SELF_TEST_WAIT_TIME             5000	// in ms - time required for vaultic to complete its self tests
 
 // Definitions for authenticaiton method
-#define USE_SEC_CHANNEL // encryption of communication with VaultIC 
+//#define USE_SEC_CHANNEL // encryption of communication with VaultIC 
 #ifdef USE_SEC_CHANNEL
 #define TLS_USER_ID 			VLT_USER1
 #define SMAC_KEY { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F}
