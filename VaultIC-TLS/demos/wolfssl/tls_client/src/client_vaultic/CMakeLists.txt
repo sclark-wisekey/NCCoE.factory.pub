@@ -1,18 +1,3 @@
-#cmake_minimum_required(VERSION 3.18)
-
-#set (EXE client_vaultic)
-#project(${EXE})
-
-#set(TLS_KIT_ROOT_FOLDER ../../../../../..)
-
-#add_subdirectory(${TLS_KIT_ROOT_FOLDER}/VaultIC-TLS/vaultic_tls/vaultic_wolfssl vaultic_wolfssl)
-
-#add_executable(${EXE} main.c)
-
-#target_link_libraries(${EXE} vaultic_wolfssl)
-
-
-
 #
 # CMakeLists.txt file for VaultIC TLS client app
 #
@@ -34,14 +19,15 @@ include_directories(${SolutionDir}wolfssl)
 include_directories(${SolutionDir}wolfssl/wolfcrypt)
 
 # Add the path to the static library
-link_directories(${SolutionDir}wolfssl/lib)
+#link_directories(${SolutionDir}wolfssl/lib)
+link_directories(${SolutionDir}VaultIC-TLS/vaultic_tls/vaultic_tls-4xx/lib)
 link_directories(${SolutionDir}VaultIC-TLS/vaultic_tls/vaultic_tls-4xx/lib/so)
 
 
 add_executable(${NAME} main.c)
 
 # vaultic_tls_crypto vaultic_tls_405
-target_link_libraries(${NAME} wolfssl vaultic_wolfssl)
+target_link_libraries(${NAME} wolfssl vaultic_tls_405 vaultic_wolfssl)
 
 
 install(TARGETS ${NAME}

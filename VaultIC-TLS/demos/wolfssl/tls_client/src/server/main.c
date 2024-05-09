@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 /* wolfSSL */
-#include <wolfssl/options.h>
+//#include <wolfssl/options.h>
 #include <wolfssl/ssl.h>
 #include <wolfssl/test.h>
 

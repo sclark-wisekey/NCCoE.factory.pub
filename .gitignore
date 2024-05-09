@@ -33,6 +33,7 @@ deviceFactoryCert.der
 **/build_keygen/
 **/.vscode
 **/build_client/
+**/build_server/
 
 # Eclipse Core
 .project
