@@ -31,7 +31,7 @@ deviceFactoryCert.der
 **/build_read_cert/
 **/build_sign/
 **/build_keygen/
-**/.vscode
+**/INeS.API.Certs/
 **/build_client/
 **/build_server/
 
