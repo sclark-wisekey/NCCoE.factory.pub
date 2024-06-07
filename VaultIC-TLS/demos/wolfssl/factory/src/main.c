@@ -20,6 +20,7 @@ IoT / Tools / Provisioning / Firmware Team
 #define CONFIG_DIR "../../VaultIC-TLS/demos/wolfssl/factory/data/inesConfig.win.ini"
 #else
 #define CONFIG_DIR "../data/inesConfig.rpi.ini"
+#include "limits.h"
 #endif
 
 // Defines
@@ -97,7 +98,12 @@ void main(int argc, char *argv[])
 	testParams.commsParams.VltBlockProtocolParams.u32msTimeout = VLT_APDU_TIME_OUT;        		// in ms - max time required by vaultic to return a response to an APDU command
 #endif
 	// Set the manufacturer password into the structure
+	// VaultIC4xx
 	unsigned char pwd[8] = { 0x58, 0x6e, 0x54, 0x79, 0x32, 0x34, 0x69, 0x6e };
+
+	// VaultIC408 v1.2
+	//unsigned char pwd[8] = { 0x33, 0x49, 0x70, 0x6D, 0x59, 0x54, 0x35, 0x58 };
+	
 	memcpy(testParams.au8ManufPassword, pwd, sizeof(pwd));
 	testParams.u8ManufPasswordLength = sizeof(pwd);
 
