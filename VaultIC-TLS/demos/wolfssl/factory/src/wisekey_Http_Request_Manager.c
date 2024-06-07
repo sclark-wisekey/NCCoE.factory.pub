@@ -39,88 +39,6 @@ typedef unsigned char byte;
 
 #define DEFAULT_PORT 11111
 
-//byte InesCA[] = "-----BEGIN CERTIFICATE-----\n\
-//MIIDtTCCAp2gAwIBAgIQdrEgUnTwhYdGs/gjGvbCwDANBgkqhkiG9w0BAQsFADBt\n\
-//MQswCQYDVQQGEwJDSDEQMA4GA1UEChMHV0lTZUtleTEiMCAGA1UECxMZT0lTVEUg\n\
-//Rm91bmRhdGlvbiBFbmRvcnNlZDEoMCYGA1UEAxMfT0lTVEUgV0lTZUtleSBHbG9i\n\
-//YWwgUm9vdCBHQiBDQTAeFw0xNDEyMDExNTAwMzJaFw0zOTEyMDExNTEwMzFaMG0x\n\
-//CzAJBgNVBAYTAkNIMRAwDgYDVQQKEwdXSVNlS2V5MSIwIAYDVQQLExlPSVNURSBG\n\
-//b3VuZGF0aW9uIEVuZG9yc2VkMSgwJgYDVQQDEx9PSVNURSBXSVNlS2V5IEdsb2Jh\n\
-//bCBSb290IEdCIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2Be3\n\
-//HEokKtaXscriHvt9OO+Y9bI5mE4nuBFde9IllIiCFSZqGzG7qFshISvYD06fWvGx\n\
-//WuR51jIjK+FTzJlFXHtPrby/h0oLS5daqPZI7H17Dc0hBt+eFf1Biki3IPShehtX\n\
-//1F1Q/7pn2COZH8g/497/b1t3sWtuuMlk9+HKQUYOKXHQuSP8yYFfTvdv37+ErXNk\n\
-//u7dCjmn21HYdfp2nuFeKUWdy19SouJVUQHMD9ur06/4oQnc/nSMbsrY9gBQHTC5P\n\
-//99UKFg29ZkM3fiNDecNAhvVMKdqOmq0NpQSHiB6F4+lT1ZvIiwNjeOvgGUpuuy9r\n\
-//M2RYk61pv48b74JIxwIDAQABo1EwTzALBgNVHQ8EBAMCAYYwDwYDVR0TAQH/BAUw\n\
-//AwEB/zAdBgNVHQ4EFgQUNQ/INmNe4qPs+TtmFc5RUuORmj0wEAYJKwYBBAGCNxUB\n\
-//BAMCAQAwDQYJKoZIhvcNAQELBQADggEBAEBM+4eymYGQfp3FsLAmzYh7KzKNbrgh\n\
-//cViXfa43FK8+5/ea4n32cZiZBKpDdHij40lhPnOMTZTg+XHEthYOU3gf1qKHLwI5\n\
-//gSk8rxWYITD+KJAAjNHhy/peyP34EEY7onhCkRd0VQreUGdNZtGn//3ZwLWoo4rO\n\
-//ZvUPQ82nK1d7Y0Zqqi5S2PTt4W2tKZB4SLrhI6qjiey1q5bAtEuiHZeeevJuQHHf\n\
-//aPFlTc58Bd9TZaml8LGXBHAVRgOY1NK/VLSgWH1Sb9pWJmLU2NuJMW8c8CLC02Ic\n\
-//Nc1MaRVUGpCY3useX8p3x8uOPUNpnJpY0CQ73xtAln41rYHHTnG6iBM=\n\
-//-----END CERTIFICATE-----";
-
-
-
-
-//byte InesCA[] = "-----BEGIN CERTIFICATE-----\n\
-//MIICaTCCAe+gAwIBAgIQISpWDK7aDKtARb8roi066jAKBggqhkjOPQQDAzBtMQsw\n\
-//CQYDVQQGEwJDSDEQMA4GA1UEChMHV0lTZUtleTEiMCAGA1UECxMZT0lTVEUgRm91\n\
-//bmRhdGlvbiBFbmRvcnNlZDEoMCYGA1UEAxMfT0lTVEUgV0lTZUtleSBHbG9iYWwg\n\
-//Um9vdCBHQyBDQTAeFw0xNzA1MDkwOTQ4MzRaFw00MjA1MDkwOTU4MzNaMG0xCzAJ\n\
-//BgNVBAYTAkNIMRAwDgYDVQQKEwdXSVNlS2V5MSIwIAYDVQQLExlPSVNURSBGb3Vu\n\
-//ZGF0aW9uIEVuZG9yc2VkMSgwJgYDVQQDEx9PSVNURSBXSVNlS2V5IEdsb2JhbCBS\n\
-//b290IEdDIENBMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAETOlQwMYPchi82PG6s4ni\n\
-//eUqjFqdrVCTbUf/q9Akkwwsin8tqJ4KBDdLArzHkdIJuyiXZjHWd8dvQmqJLIX4W\n\
-//p2OQ0jnUsYd4XxiWD1AbNTcPasbc2RNNpI6QN+a9WzGRo1QwUjAOBgNVHQ8BAf8E\n\
-//BAMCAQYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUSIcUrOPDnpBgOtfKie7T\n\
-//rYy0UGYwEAYJKwYBBAGCNxUBBAMCAQAwCgYIKoZIzj0EAwMDaAAwZQIwJsdpW9zV\n\
-//57LnyAyMjMPdeYwbY9XJUpROTYJKcx6ygISpJcBMWm1JKWB4E+J+SOtkAjEA2zQg\n\
-//Mgj/mkkCtojeFK9dbJlxjRo/i9fgojaGHAeCOnZT/cKi7e97sIBPWA9LUzm9\n\
-//-----END CERTIFICATE-----";
-
-//byte InesCA[] = "-----BEGIN CERTIFICATE-----\n\
-//MIIGkjCCBXqgAwIBAgIUbNtGETexHfEFQXKJsrzYzVL4bKAwDQYJKoZIhvcNAQEL\n\
-//BQAwRzELMAkGA1UEBhMCQ0gxEDAOBgNVBAoTB1dJU2VLZXkxJjAkBgNVBAMTHVdJ\n\
-//U2VLZXkgQ2VydGlmeUlEIFNTTCBHQiBDQSAyMB4XDTI0MDUxMDA5NTUwNloXDTI1\n\
-//MDUxMDIzNTk1OVowHDEaMBgGA1UEAwwRY2VydGlmeWlkZGVtby5jb20wggEiMA0G\n\
-//CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDdrFTD3ZErIvIa9aK8MBXUN8/g8TkJ\n\
-//CQ4Sa3gEwSN5LOf0n29KnUKv8RNXAbPEthQVXb/fqcqgXqfblAmNFwByg+1dST57\n\
-//ukZGEaSpgLtuscXBq+MGe+AYXPH5J4L9q95kofZAhVaLNPA3I2GbQCYhyISiCowo\n\
-//irsrfDV4FGPnhp4eL3oP0hYQciPa2gu7O9XL6UxmrSLFX0W5edomchHpPDRg53aT\n\
-//wcpGswC7fGI+8xIzYNygIi2sCl6eRKXUGwNlLuOFob+mabINx2+VI1IR1mqzM8PY\n\
-//UkJ2FfNb8U+Jjx4sZkoNIehXqw3IxgE5reej8NiuzdmdqfBpj6jo3mSxAgMBAAGj\n\
-//ggOfMIIDmzAMBgNVHRMBAf8EAjAAMB8GA1UdIwQYMBaAFF8bxQp7OH0+w7cxv6T7\n\
-//FCNS4Y0bMG8GCCsGAQUFBwEBBGMwYTA6BggrBgEFBQcwAoYuaHR0cDovL3B1Ymxp\n\
-//Yy53aXNla2V5LmNvbS9jcnQvd2NpZHNzbGdiY2EyLmNlcjAjBggrBgEFBQcwAYYX\n\
-//aHR0cDovL29jc3Aud2lzZWtleS5jb20wgZ8GA1UdEQSBlzCBlIIRY2VydGlmeWlk\n\
-//ZGVtby5jb22CEyouY2VydGlmeWlkZGVtby5jb22CEGNlcnRpZnlpZGRldi5jb22C\n\
-//EiouY2VydGlmeWlkZGV2LmNvbYIOd2lzZWtleWRldi5jb22CECoud2lzZWtleWRl\n\
-//di5jb22CD3dpc2VrZXlkZW1vLmNvbYIRKi53aXNla2V5ZGVtby5jb20wRQYDVR0g\n\
-//BD4wPDA6BgZngQwBAgEwMDAuBggrBgEFBQcCARYiaHR0cDovL3d3dy53aXNla2V5\n\
-//LmNvbS9yZXBvc2l0b3J5LzAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEw\n\
-//PwYDVR0fBDgwNjA0oDKgMIYuaHR0cDovL3B1YmxpYy53aXNla2V5LmNvbS9jcmwv\n\
-//d2NpZHNzbGdiY2EyLmNybDAdBgNVHQ4EFgQUVNpJd6vglmL0KoSLpPx2bMNzkN4w\n\
-//DgYDVR0PAQH/BAQDAgWgMIIBfwYKKwYBBAHWeQIEAgSCAW8EggFrAWkAdgDPEVbu\n\
-//1S58r/OHW9lpLpvpGnFnSrAX7KwB0lt3zsw7CAAAAY9h7YiQAAAEAwBHMEUCIQCs\n\
-//QQu6zN2mqV+eYhaoCKw67G62Lj4tco/p0c66WeGgFAIgbO1Y2H0PhPqE+FoL+HPb\n\
-//nf3/5iwUu2Unym1T0Y7AgAQAdgBOdaMnXJoQwzhbbNTfP1LrHfDgjhuNacCx+mSx\n\
-//Ypo53wAAAY9h7YjCAAAEAwBHMEUCICU0Rbq5WY8M+IKo2Kh6zD0v9CQRNhNrm1It\n\
-//UMzSrfjjAiEAllxdCpKFzLoq3W16V2oW0pCHDM9wJUOKRtJexOi1ZVIAdwATSt8a\n\
-//tZhCCXgMb+9MepGkFrcjSc5YV2rfrtqnwqvgIgAAAY9h7YjiAAAEAwBIMEYCIQDd\n\
-//y3utnddEIXAZO3Z0bgzMv9/ZjtZFYCGw/PFCAFUUGwIhAIYIXZBPEU/jql7npCHg\n\
-//UQVS2iBHz0hsiC0sngrgrgrOMA0GCSqGSIb3DQEBCwUAA4IBAQAINCoLBdiiGOEZ\n\
-//N5Srm9HXjvIsUJpE/7XxWEsXwIIHDVno8rKcgNTMU/98rLwOy3//+/elVgE8cXnb\n\
-//RwuCig5FOi868905t+mXVzW5gUnck0wAU2TUVF/k0HSEvNl1c0TgMmY+gPkRECPP\n\
-//NIptgn4AIz9QeI6D3y/2ka4Qe1jSprkzGXpMwHg55d3aR4Li9iTNUHDRDr05Ian1\n\
-//KRrWPPhw4XUyklqHvXNIB/ehxOfMiXQU7jBniB8cJgPpS1rx6tkg/Cv0GdVlUzEA\n\
-//BcGKPP5B1ZkFdUUfEtSxkgJH/55b1jLDck0PMWF8ggVxeamMhXM838sMJcCCOYXd\n\
-//a4/707LQ\n\
-//-----END CERTIFICATE-----";
-
-
 /* Constants that aren't configurable in menuconfig */
 #define WEB_PORT "443"
 
@@ -185,7 +103,6 @@ int httpsRequestWolf(char*clientCertPath,char*clientKeyPath)
 		return ret;
 	}
 	wolfSSL_Debugging_ON();
-    
 
     /*---------------------------------*/
     /* Start of wolfSSL initialization and configuration */
@@ -215,15 +132,6 @@ int httpsRequestWolf(char*clientCertPath,char*clientKeyPath)
 		return ret;
 	}
 
-    //if ((ret = wolfSSL_CTX_load_verify_locations(ctx, CA_FILE, NULL))
-    //if ((ret = wolfSSL_CTX_load_verify_buffer(ctx, InesCA, sizeof(InesCA),SSL_FILETYPE_PEM))!= SSL_SUCCESS) {
-    //    fprintf(stderr, "ERROR: failed to load CA err !%d\n",ret);
-    //    wolfSSL_CTX_free(ctx);  /* Free the wolfSSL context object          */
-    //    wolfSSL_Cleanup();
-    //    ret = -1;
-    //    return ret;
-    //}
-
     // Load client certificates into WOLFSSL_CTX
     if ((ret =  wolfSSL_CTX_use_certificate_file(ctx, clientCertPath,SSL_FILETYPE_PEM)) != SSL_SUCCESS) {
         fprintf(stderr, "ERROR: %d failed to load client certificate %s, please check the file.\n", ret,clientCertPath);
@@ -245,17 +153,6 @@ int httpsRequestWolf(char*clientCertPath,char*clientKeyPath)
 	//if ((ret = wolfSSL_CTX_UseSecureRenegotiation(ctx))
 	//	!= SSL_SUCCESS) {
 	//	fprintf(stderr, "ERROR: wolfSSL_CTX_UseSecureRenegotiation %d\n", ret);
-	//	wolfSSL_CTX_free(ctx);  /* Free the wolfSSL context object          */
-	//	wolfSSL_Cleanup();
-	//	ret = -1;
-	//	return ret;
-	//}
-
-	//// Set the cipher list 
-	//const char* cipherlist = "ECDHE-ECDSA-AES128-GCM-SHA256";
-	//if ((ret = wolfSSL_CTX_set_cipher_list(ctx, cipherlist)) != WOLFSSL_SUCCESS) {
-	//	fprintf(stderr, "ERROR: failed to set cipher list.\n");
-	//	ret = -1;
 	//	wolfSSL_CTX_free(ctx);  /* Free the wolfSSL context object          */
 	//	wolfSSL_Cleanup();
 	//	ret = -1;
