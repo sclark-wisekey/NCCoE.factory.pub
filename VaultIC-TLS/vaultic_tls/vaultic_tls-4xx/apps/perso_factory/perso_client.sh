@@ -4,4 +4,4 @@
 devCertFile=./certs/deviceFactoryCert.der
 caCertFile=./certs/rootCACert.der
 
-./perso_factory $devKeyFile $devCertFile $caCertFile 
+./perso_factory $devCertFile $caCertFile 
