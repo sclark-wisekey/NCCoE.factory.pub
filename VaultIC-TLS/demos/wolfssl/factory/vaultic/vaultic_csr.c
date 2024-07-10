@@ -430,6 +430,7 @@ VLT_STS VltSign(VLT_ECC_ID curveId, VLT_U8 privGrp, VLT_U8 privIdx, VLT_U8* pMsg
  * \param[in]		lenSig			Length of the signature buffer
  * \return		VLT_OK on success otherwise an error code
 */
+#ifdef _WIN32
 VLT_STS VltVerify(VLT_ECC_ID curveId, VLT_KEY_OBJ_ECDSA_PUB* pPubObj, VLT_U8* pMsg, VLT_U16 lenMsg, VLT_U8* pSig, VLT_U16 lenSig)
 {
 	unsigned short usActualSW = 0;
@@ -473,6 +474,7 @@ VLT_STS VltVerify(VLT_ECC_ID curveId, VLT_KEY_OBJ_ECDSA_PUB* pPubObj, VLT_U8* pM
 
 	return VLT_OK;
 }
+#endif
 
 /**
  * \brief Merge the public key into the CSR

@@ -22,7 +22,8 @@ link_directories(${SolutionDir}VaultIC-TLS/vaultic_tls/vaultic_tls-4xx/lib)
 
 add_executable(${NAME} main.c)
 
-target_link_libraries(${NAME} vaultic_tls_405 vaultic_tls_crypto)
+#target_link_libraries(${NAME} vaultic_tls_405 vaultic_tls_crypto)
+target_link_libraries(${NAME} vaultic_tls_408 vaultic_tls_crypto)
 
 
 install(TARGETS ${NAME}

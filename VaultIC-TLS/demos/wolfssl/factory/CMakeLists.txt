@@ -5,7 +5,8 @@ cmake_minimum_required(VERSION 3.6)
 project(factory VERSION 1.0.0)
 
 # Preprocessor Definitions
-add_compile_definitions(TARGETCHIP_VAULTIC_405 USE_SPI WOLFSSL_USER_SETTINGS)
+#add_compile_definitions(TARGETCHIP_VAULTIC_405 USE_SPI WOLFSSL_USER_SETTINGS)
+add_compile_definitions(TARGETCHIP_VAULTIC_408 USE_SPI WOLFSSL_USER_SETTINGS)
 
 # Include local libraries in the CMake process
 add_subdirectory(lib/ini)
@@ -55,4 +56,5 @@ add_executable(${PROJECT_NAME} ${SRCS} ${HEADERS})
 
 target_link_libraries(${PROJECT_NAME} ini json vaultic )
 target_link_libraries(${PROJECT_NAME} libwolfssl.a m)
-target_link_libraries(${PROJECT_NAME} libvaultic_tls_405.a libvaultic_tls_crypto.a)
+#target_link_libraries(${PROJECT_NAME} libvaultic_tls_405.a libvaultic_tls_crypto.a)
+target_link_libraries(${PROJECT_NAME} libvaultic_tls_408.a libvaultic_tls_crypto.a)

@@ -20,7 +20,8 @@ link_directories(${SolutionDir}VaultIC-TLS/vaultic_tls/vaultic_tls-4xx/lib)
 
 add_executable(${NAME} main.c)
 
-target_link_libraries(${NAME} vaultic_tls_405)
+#target_link_libraries(${NAME} vaultic_tls_405)
+target_link_libraries(${NAME} vaultic_tls_408)
 
 install(TARGETS ${NAME}
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
