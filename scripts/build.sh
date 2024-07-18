@@ -50,6 +50,9 @@ cmake --build .
 # return to /apps folder
 pushd ../../
 
+# Sign a file using the VaultIC factory private key
+# => Execute get_signature <filename>
+
 # Build the sign using VaultIC demonstration
 pushd sign
 rm -rf build

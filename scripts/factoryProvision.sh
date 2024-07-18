@@ -7,7 +7,7 @@
 # => Sends CSR to INeS and retrieve the certificate
 # => Writes the deviceFactoryCert.pem certificate to /certificates folder
 
-# Build the factory demonstration
+# Execute the factory demonstration
 pushd ../VaultIC-TLS/demos/wolfssl/factory/build
 ./factory
 

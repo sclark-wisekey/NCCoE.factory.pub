@@ -5,6 +5,7 @@ Public repository for the NCCoE Factory Use Case
 > Obtain a VaultIC for RaspberryPi kit from SealSQ
 >> Contact: sclark@sealsq.com
 > Run on Bookworm 64 RaspberryPi distribution.
+> Optional: Create keypair and certificates on Windowsgit
 
 Raspberry Pi:
 > Demonstrations:
@@ -16,17 +17,17 @@ Raspberry Pi:
 >> Sign using the VaultIC private key
 
 Build demonstrations:
-- Browse to the scripts folder
+- Browse to the /scripts folder
 	o chmod +rwx *.sh
 	o ./install.sh
 	o ./build.sh
-
+c
 Create keypair & provision certificate to the VaultIC:
-- Browse to the scripts folder
+- Browse to the /scripts folder
 	o ./factoryProvision.sh
 
 Read the Certificate from the VaultIC:
-- Browse to the scripts folder
+- Browse to the /scripts folder
 	o ./readCert.sh
 
 
