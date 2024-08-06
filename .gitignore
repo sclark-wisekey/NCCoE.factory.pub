@@ -17,11 +17,12 @@ tmp/
 local.properties
 .settings/
 .loadpath
+.vscode/
 
 # Exclude the output files after execution
 factory.csr
-deviceFactoryCert.pem
-deviceFactoryCert.der
+#deviceFactoryCert.pem
+#deviceFactoryCert.der
 
 /Release/
 **/build_factory/
