@@ -918,6 +918,9 @@ WOLFSSL_API WOLFSSL_METHOD *wolfSSLv23_method(void);
 #endif
 #endif /* !WOLFSSL_NO_TLS12 */
 
+// Hack to enable TLS 1.3
+#define WOLFSSL_TLS13
+
 #ifdef WOLFSSL_TLS13
     WOLFSSL_API WOLFSSL_METHOD *wolfTLSv1_3_method_ex(void* heap);
     WOLFSSL_API WOLFSSL_METHOD *wolfTLSv1_3_method(void);

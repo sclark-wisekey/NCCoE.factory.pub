@@ -59,6 +59,9 @@
 #include <wolfssl/options.h>
 #endif
 
+#define WOLFSSL_TLS13
+
+
 /* Uncomment next line if using IPHONE */
 /* #define IPHONE */
 

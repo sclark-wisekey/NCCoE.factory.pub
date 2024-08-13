@@ -20,7 +20,7 @@ include_directories(${SolutionDir}wolfssl/wolfcrypt)
 
 # Add the path to the static library
 #link_directories(${SolutionDir}wolfssl/lib)
-#link_directories(${SolutionDir}VaultIC-TLS/vaultic_tls/vaultic_tls-4xx/lib)
+link_directories(${SolutionDir}VaultIC-TLS/vaultic_tls/vaultic_tls-4xx/lib)
 link_directories(${SolutionDir}VaultIC-TLS/vaultic_tls/vaultic_tls-4xx/lib/so)
 
 

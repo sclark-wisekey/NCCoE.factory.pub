@@ -27,6 +27,7 @@
 #include <vaultic_tls.h>
 
 #define DEFAULT_PORT 4433
+//#define DEFAULT_PORT 12345
 
 
 
@@ -69,6 +70,14 @@ int main(int argc, char** argv)
         ip_address = buff;
     }
     
+//    if (argc >=3) {
+//        /* Get port from program arguments */
+//        message = argv[2];
+//    }
+//    else {
+//       /* Port will be set to DEFAULT_PORT */
+//    }
+    
     if (argc >=3) {
         /* Get message from program arguments */
         message = argv[2];
@@ -85,13 +94,13 @@ int main(int argc, char** argv)
                 break;
 
             default:
-                wolfTLS_client_method = wolfTLSv1_3_client_method();
+                wolfTLS_client_method = (WOLFSSL_METHOD *)wolfTLSv1_3_client_method();
                 break;
         }
     }
     else {
         /* Use TLS 1.3 by default */
-        wolfTLS_client_method = wolfTLSv1_3_client_method();
+        wolfTLS_client_method = (WOLFSSL_METHOD *)wolfTLSv1_3_client_method();
     }
     
     /* Create a socket that uses an internet IPv4 address,
